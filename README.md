@@ -1,0 +1,1 @@
+# paywaz-sdk-js
