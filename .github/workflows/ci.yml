@@ -1,0 +1,6 @@
+name: SDK CI
+on: [push, pull_request]
+
+jobs:
+  ci:
+    uses: hellopaywaz/.github/.github/workflows/node-ci.yml@main
