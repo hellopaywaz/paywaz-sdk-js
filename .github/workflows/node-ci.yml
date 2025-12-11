@@ -4,45 +4,30 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 jobs:
-  ci:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      - name: Install dependencies
+      - name: Install deps
         run: npm ci
 
       - name: Lint
-        run: |
-          if npm run | grep -q "lint"; then
-            npm run lint
-          else
-            echo "No lint script – skipping"
-          fi
+        run: npm run lint --if-present
+
+      - name: Type check
+        run: npm run typecheck --if-present
 
       - name: Test
-        run: |
-          if npm run | grep -q "test"; then
-            npm test
-          else
-            echo "No test script – skipping"
-          fi
+        run: npm test --if-present
 
       - name: Build
-        run: |
-          if npm run | grep -q "build"; then
-            npm run build
-          else
-            echo "No build script – skipping"
-          fi
+        run: npm run build
