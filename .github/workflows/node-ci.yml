@@ -1,36 +1,54 @@
-name: Build and Test
+name: SDK CI (Build, Typecheck, Lint, Test)
 
 on:
   push:
-    branches: [main, dev]
+    branches: [ main ]
   pull_request:
-    branches: [main, dev]
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
 
       - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck || npm run tsc --noEmit
+
+      - name: Lint
+        run: npm run lint || echo "No lint script found"
+
+      - name: Build SDK
+        run: npm run build
+
+      - name: Run tests
+        run: npm test --if-present
+
+      - name: Verify ES Module Build
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
+          if [ ! -f dist/index.esm.js ]; then
+            echo "ESM build missing!"
+            exit 1
           fi
 
-      - name: Build project
+      - name: Verify CommonJS Build
         run: |
-          if npm run | grep -q "build"; then
-            npm run build
-          else
-            echo "No build script found — skipping."
+          if [ ! -f dist/index.cjs.js ]; then
+            echo "CJS build missing!"
+            exit 1
           fi
