@@ -4,9 +4,10 @@ import * as webhooks from "./webhooks";
 export class PaywazClient {
   payments: PaymentsClient;
 
-  constructor(apiKey: string) {
-    this.payments = new PaymentsClient(apiKey);
+  constructor(apiKey: string, baseUrl = "https://api.paywaz.com") {
+    this.payments = new PaymentsClient(apiKey, baseUrl);
   }
 }
 
 export { webhooks };
+
