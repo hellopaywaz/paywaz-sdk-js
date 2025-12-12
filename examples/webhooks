@@ -2,10 +2,10 @@ app.post(
   "/webhooks/paywaz",
   bodyParser.raw({ type: "application/json" }),
   (req, res) => {
-    webhooks.verifyPaywazWebhook({
-      payload: req.body.toString(),
-      signatureHeader: req.headers["paywaz-signature"],
-      timestampHeader: req.headers["paywaz-timestamp"],
+    verifyPaywazWebhook({
+      payload: req.body.toString("utf8"),
+      signatureHeader: req.headers["paywaz-signature"] as string,
+      timestampHeader: req.headers["paywaz-timestamp"] as string,
       secret: process.env.PAYWAZ_WEBHOOK_SECRET!,
     });
 
