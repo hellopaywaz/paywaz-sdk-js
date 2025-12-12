@@ -1,0 +1,93 @@
+paths:
+  /payments:
+    post:
+      operationId: createPayment
+      summary: Create a payment
+      description: Initiates a zero-fee crypto or stablecoin payment
+      tags:
+        - Payments
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+      responses:
+        "201":
+          description: Payment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+                
+components:
+  schemas:
+    CreatePaymentRequest:
+      type: object
+      required:
+        - amount
+        - currency
+        - destination
+      properties:
+        amount:
+          type: string
+          description: Amount in smallest unit (e.g. cents, lamports)
+          example: "1000"
+        currency:
+          type: string
+          example: "USDC"
+        destination:
+          type: string
+          description: Destination wallet or account identifier
+        autoConvert:
+          type: boolean
+          default: false
+          description: Auto-convert incoming funds to Paywaz hedged stablecoin
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Merchant-defined metadata (order_id, customer_id, etc)
+
+              Payment:
+      type: object
+      required:
+        - id
+        - status
+        - amount
+        - currency
+        - createdAt
+      properties:
+        id:
+          type: string
+          example: "pay_01HZXQ9K8M8F4A"
+        status:
+          type: string
+          enum:
+            - pending
+            - confirmed
+            - settled
+            - failed
+        amount:
+          type: string
+        currency:
+          type: string
+        destination:
+          type: string
+        transactionHash:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
+
+pending → confirmed → settled
+         ↘ failed
