@@ -1,0 +1,38 @@
+app.post(
+  "/webhooks/paywaz",
+  bodyParser.raw({ type: "application/json" }),
+  (req, res) => {
+    webhooks.verifyPaywazWebhook({
+      payload: req.body.toString(),
+      signatureHeader: req.headers["paywaz-signature"],
+      timestampHeader: req.headers["paywaz-timestamp"],
+      secret: process.env.PAYWAZ_WEBHOOK_SECRET!,
+    });
+
+    res.sendStatus(200);
+  }
+);
+
+export async function POST(req: Request) {
+  const payload = await req.text();
+
+  webhooks.verifyPaywazWebhook({
+    payload,
+    signatureHeader: req.headers.get("paywaz-signature")!,
+    timestampHeader: req.headers.get("paywaz-timestamp")!,
+    secret: process.env.PAYWAZ_WEBHOOK_SECRET!,
+  });
+
+  return new Response("ok");
+}
+
+fastify.post("/webhooks/paywaz", { rawBody: true }, (req, reply) => {
+  webhooks.verifyPaywazWebhook({
+    payload: req.rawBody,
+    signatureHeader: req.headers["paywaz-signature"] as string,
+    timestampHeader: req.headers["paywaz-timestamp"] as string,
+    secret: process.env.PAYWAZ_WEBHOOK_SECRET!,
+  });
+
+  reply.code(200).send();
+});
