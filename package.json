@@ -1,1 +1,8 @@
 export { verifyPaywazWebhook } from "./verify";
+{
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  }
+}
+
