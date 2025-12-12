@@ -39,6 +39,3 @@ const session = await client.createPayment({
 
 console.log(session);
 
----
-
-import { PaywazClient, webhooks } from "@paywaz/sdk";
