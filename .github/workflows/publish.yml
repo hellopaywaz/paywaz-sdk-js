@@ -1,0 +1,44 @@
+name: Publish SDK to npm
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Run tests
+        run: npm test --if-present
+
+      - name: Build SDK
+        run: npm run build
+
+      - name: Set version from GitHub Release tag
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/}"
+          npm version "$VERSION" --no-git-tag-version
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
