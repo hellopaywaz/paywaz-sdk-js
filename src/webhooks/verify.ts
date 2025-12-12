@@ -1,49 +1,47 @@
 import crypto from "crypto";
 
-export interface VerifyWebhookArgs {
-  payload: string;           // RAW request body
-  signatureHeader: string;   // Paywaz-Signature
-  timestampHeader: string;   // Paywaz-Timestamp
-  secret: string;            // Webhook signing secret
-}
-
 export function verifyPaywazWebhook({
   payload,
   signatureHeader,
   timestampHeader,
   secret,
-}: VerifyWebhookArgs): true {
+}: {
+  payload: string;
+  signatureHeader: string | null;
+  timestampHeader: string | null;
+  secret: string;
+}) {
   if (!signatureHeader || !timestampHeader) {
-    throw new Error("Missing webhook signature headers");
+    throw new Error("Missing Paywaz webhook headers");
   }
 
   const timestamp = Number(timestampHeader);
   if (Number.isNaN(timestamp)) {
-    throw new Error("Invalid webhook timestamp");
-  }
-
-  // Replay protection (5 minutes)
-  const now = Math.floor(Date.now() / 1000);
-  if (Math.abs(now - timestamp) > 300) {
-    throw new Error("Webhook timestamp expired");
+    throw new Error("Invalid Paywaz-Timestamp header");
   }
 
   const signedPayload = `${timestamp}.${payload}`;
 
-  const expectedSignature = crypto
+  const expected = crypto
     .createHmac("sha256", secret)
     .update(signedPayload)
     .digest("hex");
 
-  const providedSignature = signatureHeader.replace(/^v1=/, "");
+  const provided = signatureHeader.replace(/^v1=/, "");
 
   if (
+    expected.length !== provided.length ||
     !crypto.timingSafeEqual(
-      Buffer.from(expectedSignature, "hex"),
-      Buffer.from(providedSignature, "hex")
+      Buffer.from(expected),
+      Buffer.from(provided)
     )
   ) {
-    throw new Error("Invalid webhook signature");
+    throw new Error("Invalid Paywaz webhook signature");
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  if (Math.abs(now - timestamp) > 300) {
+    throw new Error("Webhook timestamp expired");
   }
 
   return true;
