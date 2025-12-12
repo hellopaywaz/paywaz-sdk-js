@@ -5,5 +5,5 @@
 // It exports the core client class and utilities.
 //
 
-export * from "./client";
-export * from "./utils";
+export * as webhooks from "./webhooks";
+
