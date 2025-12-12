@@ -26,6 +26,40 @@ paths:
               schema:
                 $ref: "#/components/schemas/Payment"
 
+  /webhooks/payments:
+    post:
+      operationId: receivePaymentWebhook
+      summary: Receive payment webhook events
+      description: Receives asynchronous payment lifecycle events from Paywaz
+      tags:
+        - Webhooks
+      parameters:
+        - name: Paywaz-Signature
+          in: header
+          required: true
+          schema:
+            type: string
+          description: HMAC-SHA256 signature of the request payload
+        - name: Paywaz-Timestamp
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Unix timestamp (seconds) when the event was generated
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookEvent"
+      responses:
+        "200":
+          description: Webhook processed successfully
+        "400":
+          description: Invalid payload or signature
+        "401":
+          description: Signature verification failed
+
   /payments/{paymentId}:
     get:
       operationId: getPayment
@@ -79,6 +113,37 @@ components:
           additionalProperties: true
           description: Merchant-defined metadata (order_id, customer_id, etc)
 
+    WebhookEvent:
+      type: object
+      required:
+        - id
+        - type
+        - createdAt
+        - data
+      properties:
+        id:
+          type: string
+          description: Unique webhook event ID
+          example: "evt_01HZXY9M8A3P9"
+        type:
+          type: string
+          description: Event type
+          enum:
+            - payment.pending
+            - payment.confirmed
+            - payment.settled
+            - payment.failed
+        createdAt:
+          type: string
+          format: date-time
+        data:
+          type: object
+          required:
+            - payment
+          properties:
+            payment:
+              $ref: "#/components/schemas/Payment"
+
     Payment:
       type: object
       required:
@@ -116,3 +181,36 @@ components:
 
 pending → confirmed → settled
          ↘ failed
+
+signature = HMAC_SHA256(
+  secret = webhook_secret,
+  message = `${timestamp}.${raw_body}`
+)
+
+Paywaz-Timestamp: 1718123456
+Paywaz-Signature: v1=abcdef123456...
+
+import crypto from "crypto";
+
+function verifyPaywazWebhook({
+  payload,
+  signature,
+  timestamp,
+  secret,
+}) {
+  const signedPayload = `${timestamp}.${payload}`;
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(signedPayload)
+    .digest("hex");
+
+  return crypto.timingSafeEqual(
+    Buffer.from(expected),
+    Buffer.from(signature.replace("v1=", ""))
+  );
+}
+
+if (Math.abs(now - timestamp) > 300) {
+  throw new Error("Webhook timestamp expired");
+}
+
