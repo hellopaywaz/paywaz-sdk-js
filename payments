@@ -25,7 +25,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Payment"
-                
+
 components:
   schemas:
     CreatePaymentRequest:
@@ -54,7 +54,7 @@ components:
           additionalProperties: true
           description: Merchant-defined metadata (order_id, customer_id, etc)
 
-              Payment:
+    Payment:
       type: object
       required:
         - id
