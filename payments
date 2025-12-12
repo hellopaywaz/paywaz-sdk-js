@@ -26,6 +26,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/Payment"
 
+  /payments/{paymentId}:
+    get:
+      operationId: getPayment
+      summary: Retrieve a payment
+      description: Retrieve the current status and details of a payment
+      tags:
+        - Payments
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Paywaz payment identifier
+          example: "pay_01HZXQ9K8M8F4A"
+      responses:
+        "200":
+          description: Payment retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "404":
+          description: Payment not found
+
 components:
   schemas:
     CreatePaymentRequest:
