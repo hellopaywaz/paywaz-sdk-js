@@ -3,7 +3,11 @@ name: Publish SDK to npm
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  id-token: write
 
 jobs:
   publish:
@@ -15,13 +19,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: https://registry.npmjs.org/
+          registry-url: https://registry.npmjs.org
 
       - run: npm ci
       - run: npm test --if-present
       - run: npm run build
 
-      - name: Publish
+      - name: Publish to npm
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
