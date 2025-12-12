@@ -1,4 +1,14 @@
-export { verifyPaywazWebhook } from "./verify";
+{
+  "name": "@paywaz/sdk",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  }
+}
 {
   "scripts": {
     "build": "tsc",
