@@ -39,5 +39,3 @@ const session = await client.createPayment({
 
 console.log(session);
 
-v0.0.1-test
-
