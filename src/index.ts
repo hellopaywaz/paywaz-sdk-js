@@ -1,9 +1,12 @@
-//
-// Paywaz JavaScript SDK (Preview)
-// -------------------------------
-// This is a public-facing placeholder for the future Paywaz SDK.
-// It exports the core client class and utilities.
-//
+import { PaymentsClient } from "./payments";
+import * as webhooks from "./webhooks";
 
-export * as webhooks from "./webhooks";
+export class PaywazClient {
+  payments: PaymentsClient;
 
+  constructor(apiKey: string) {
+    this.payments = new PaymentsClient(apiKey);
+  }
+}
+
+export { webhooks };
