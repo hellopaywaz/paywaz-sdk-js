@@ -15,4 +15,9 @@
     "prepublishOnly": "npm run build"
   }
 }
+{
+  "scripts": {
+    "generate:sdk": "ts-node scripts/generate-sdk.ts"
+  }
+}
 
