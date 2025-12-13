@@ -17,6 +17,11 @@ security:
 paths:
   /payments:
     post:
+      parameters:
+        - $ref: "#/parameters/PaywazVersion"
+paths:
+  /payments:
+    post:
       operationId: createPayment
       summary: Create a payment
       description: Initiates a zero-fee crypto or stablecoin payment
