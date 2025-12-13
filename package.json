@@ -20,4 +20,9 @@
     "generate:sdk": "ts-node scripts/generate-sdk.ts"
   }
 }
+{
+  "scripts": {
+    "docs": "typedoc"
+  }
+}
 
