@@ -12,3 +12,7 @@ export async function POST(req: Request) {
 
   return new Response("ok");
 }
+{
+  "eventVersion": "2025-01-01"
+}
+
