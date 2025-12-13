@@ -1,5 +1,7 @@
 {
   "name": "@paywaz/sdk",
+  "version": "0.1.0",
+  "description": "Paywaz JavaScript SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -7,28 +9,21 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     }
-  }
-}
-{
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
-    "prepublishOnly": "npm run build"
-  }
-}
-{
-  "scripts": {
-    "generate:sdk": "ts-node scripts/generate-sdk.ts"
-  }
-}
-{
-  "scripts": {
-    "docs": "typedoc"
-  }
-}
-{
-  "scripts": {
+    "generate:sdk": "ts-node scripts/generate-sdk.ts",
     "docs": "typedoc",
-    "generate:sdk": "ts-node scripts/generate-sdk.ts"
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0",
+    "typedoc": "^0.25.0",
+    "@openapitools/openapi-generator-cli": "^2.7.0"
   }
 }
-
