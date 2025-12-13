@@ -12,6 +12,8 @@ The **Paywaz JavaScript SDK** provides an easy way to integrate zero-fee, crypto
 
 > SDK is in pre-release mode.  
 > Interfaces, request structures, and endpoints are subject to change as Paywaz approaches public launch.
+>
+> Paywaz-Version: 2025-01-01
 
 ---
 
