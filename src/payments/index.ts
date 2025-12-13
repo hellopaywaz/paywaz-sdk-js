@@ -26,6 +26,16 @@ export class PaymentsClient {
     );
     return res;
   }
+  async create(payload, idempotencyKey) {
+  return this.api.createPayment(
+    payload,
+    {
+      "Idempotency-Key": idempotencyKey,
+      ...this.client.headers,
+    }
+  );
+}
+
 
   async retrieve(paymentId: string): Promise<Payment> {
     return this.api.getPayment(paymentId);
