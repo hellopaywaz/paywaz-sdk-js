@@ -125,16 +125,16 @@ components:
       name: Authorization
 
   parameters:
-    PaywazVersion:
-      name: Paywaz-Version
-      in: header
-      required: false
-      schema:
-        type: string
-        example: "2025-01-01"
-      description: |
-        API version requested.
-        Defaults to the latest stable version if omitted.
+  PaywazVersion:
+    name: Paywaz-Version
+    in: header
+    required: false
+    schema:
+      type: string
+      example: "2025-01-01"
+    description: |
+      API version to use.
+      Defaults to the latest version if not provided.
 
   schemas:
     CreatePaymentRequest:
