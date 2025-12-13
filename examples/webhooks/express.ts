@@ -20,3 +20,7 @@ app.post(
 );
 
 app.listen(3000);
+{
+  "eventVersion": "2025-01-01"
+}
+
