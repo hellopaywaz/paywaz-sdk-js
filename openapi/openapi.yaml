@@ -2,12 +2,10 @@ openapi: 3.1.0
 
 info:
   title: Paywaz Public API
+  version: 2025-01-01
   description: |
-    Paywaz Public API — the developer gateway into zero-fee, crypto-native payments.
-
-    Supports stablecoins, Solana-native settlement, API versioning,
-    and enterprise-grade webhook delivery.
-  version: 0.1.0
+    Paywaz Public API.
+    Versioned via the `Paywaz-Version` request header.
 
 servers:
   - url: https://api.paywaz.com
@@ -24,7 +22,6 @@ paths:
       description: Initiates a zero-fee crypto or stablecoin payment
       tags: [Payments]
       parameters:
-        - $ref: "#/components/parameters/PaywazVersion"
         - name: Idempotency-Key
           in: header
           required: true
@@ -48,16 +45,13 @@ paths:
     get:
       operationId: getPayment
       summary: Retrieve a payment
-      description: Retrieve the current status and details of a payment
       tags: [Payments]
       parameters:
-        - $ref: "#/components/parameters/PaywazVersion"
         - name: paymentId
           in: path
           required: true
           schema:
             type: string
-          example: "pay_01HZXQ9K8M8F4A"
       responses:
         "200":
           description: Payment retrieved
@@ -76,8 +70,9 @@ paths:
         Receives asynchronous payment lifecycle events from Paywaz.
 
         ### Webhook Signature Verification
+        Paywaz signs webhook events using HMAC-SHA256.
 
-        **Header format**
+        **Signature format**
         ```
         Paywaz-Signature: v1=<hex_signature>
         ```
@@ -92,20 +87,12 @@ paths:
 
         **Replay protection**
         - Reject events where |now − timestamp| > 300 seconds
+
       tags: [Webhooks]
-      security: []   # Webhooks never require API auth
+      security: []
       parameters:
-        - name: Paywaz-Signature
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: Paywaz-Timestamp
-          in: header
-          required: true
-          schema:
-            type: string
-            description: Unix timestamp (seconds)
+        - $ref: "#/components/parameters/PaywazSignature"
+        - $ref: "#/components/parameters/PaywazTimestamp"
       requestBody:
         required: true
         content:
@@ -121,23 +108,75 @@ paths:
           description: Signature verification failed
 
 components:
-  securitySchemes:
-    ApiKeyAuth:
+  schemas:
+    WebhookEvent:
+      type: object
+      required:
+        - id
+        - type
+        - eventVersion
+        - livemode
+        - createdAt
+        - data
+      properties:
+        id:
+          type: string
+          example: "evt_01HZXY9M8A3P9"
+
+        type:
+          type: string
+          enum:
+            - payment.pending
+            - payment.confirmed
+            - payment.settled
+            - payment.failed
+
+        eventVersion:
+          type: string
+          description: Version of the webhook payload schema
+          example: "2025-01-01"
+
+        livemode:
+          type: boolean
+
+        createdAt:
+          type: string
+          format: date-time
+
+        data:
+          type: object
+          required: [payment]
+          properties:
+            payment:
+              $ref: "#/components/schemas/Payment"
+
+    PaywazWebhookSignature:
       type: apiKey
       in: header
-      name: Authorization
+      name: Paywaz-Signature
+      description: |
+        HMAC-SHA256 webhook signature.
+        Format: `v1=<hex_digest>`
 
   parameters:
-    PaywazVersion:
-      name: Paywaz-Version
+  PaywazVersion:
+    name: Paywaz-Version
+    in: header
+    required: false
+    schema:
+      type: string
+      example: "2025-01-01"
+    description: |
+      API version to use for this request.
+      Defaults to the account's pinned version if omitted.
+
+    PaywazTimestamp:
+      name: Paywaz-Timestamp
       in: header
-      required: false
+      required: true
       schema:
         type: string
-        example: "2025-01-01"
-      description: |
-        API version to use.
-        Defaults to the latest version if not provided.
+        description: Unix timestamp (seconds)
 
   schemas:
     CreatePaymentRequest:
@@ -146,10 +185,8 @@ components:
       properties:
         amount:
           type: string
-          description: Amount in smallest unit (e.g. cents, lamports)
         currency:
           type: string
-          example: USDC
         destination:
           type: string
         autoConvert:
@@ -200,7 +237,6 @@ components:
             - payment.failed
         eventVersion:
           type: string
-          example: "2025-01-01"
         livemode:
           type: boolean
         createdAt:
