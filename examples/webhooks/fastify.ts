@@ -12,3 +12,7 @@ fastify.post(
     reply.code(200).send();
   }
 );
+{
+  "eventVersion": "2025-01-01"
+}
+
