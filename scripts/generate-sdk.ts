@@ -5,5 +5,5 @@ execSync(`
     -i ./openapi/openapi.yaml \
     -g typescript-fetch \
     -o ./src/generated \
-    --additional-properties=useSingleRequestParameter=true
-
+    --additional-properties=supportsES6=true,typescriptThreePlus=true
+`, { stdio: "inherit" });
