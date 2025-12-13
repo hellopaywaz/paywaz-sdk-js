@@ -1,15 +1,3 @@
-components:
-  parameters:
-    PaywazVersion:
-      name: Paywaz-Version
-      in: header
-      required: false
-      schema:
-        type: string
-        example: "2025-01-01"
-      description: |
-        API version requested. Defaults to the latest stable version.
-
 openapi: 3.1.0
 
 info:
@@ -29,17 +17,12 @@ security:
 paths:
   /payments:
     post:
-      parameters:
-        - $ref: "#/components/parameters/PaywazVersion"
-
-paths:
-  /payments:
-    post:
       operationId: createPayment
       summary: Create a payment
       description: Initiates a zero-fee crypto or stablecoin payment
       tags: [Payments]
       parameters:
+        - $ref: "#/components/parameters/PaywazVersion"
         - name: Idempotency-Key
           in: header
           required: true
@@ -63,8 +46,10 @@ paths:
     get:
       operationId: getPayment
       summary: Retrieve a payment
+      description: Retrieve the current status and details of a payment
       tags: [Payments]
       parameters:
+        - $ref: "#/components/parameters/PaywazVersion"
         - name: paymentId
           in: path
           required: true
@@ -88,9 +73,8 @@ paths:
         Receives asynchronous payment lifecycle events from Paywaz.
 
         ### Webhook Signature Verification
-        Paywaz signs webhook events using HMAC-SHA256.
 
-        **Signature format**
+        **Signature header**
         ```
         Paywaz-Signature: v1=<hex_signature>
         ```
@@ -105,12 +89,20 @@ paths:
 
         **Replay protection**
         - Reject events where |now − timestamp| > 300 seconds
-
       tags: [Webhooks]
       security: []
       parameters:
-        - $ref: "#/components/parameters/PaywazSignature"
-        - $ref: "#/components/parameters/PaywazTimestamp"
+        - name: Paywaz-Signature
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: Paywaz-Timestamp
+          in: header
+          required: true
+          schema:
+            type: string
+            description: Unix timestamp (seconds)
       requestBody:
         required: true
         content:
@@ -132,29 +124,17 @@ components:
       in: header
       name: Authorization
 
-    PaywazWebhookSignature:
-      type: apiKey
-      in: header
-      name: Paywaz-Signature
-      description: |
-        HMAC-SHA256 webhook signature.
-        Format: `v1=<hex_digest>`
-
   parameters:
-    PaywazSignature:
-      name: Paywaz-Signature
+    PaywazVersion:
+      name: Paywaz-Version
       in: header
-      required: true
+      required: false
       schema:
         type: string
-
-    PaywazTimestamp:
-      name: Paywaz-Timestamp
-      in: header
-      required: true
-      schema:
-        type: string
-        description: Unix timestamp (seconds)
+        example: "2025-01-01"
+      description: |
+        API version requested.
+        Defaults to the latest stable version if omitted.
 
   schemas:
     CreatePaymentRequest:
@@ -163,8 +143,10 @@ components:
       properties:
         amount:
           type: string
+          description: Amount in smallest unit (e.g. cents, lamports)
         currency:
           type: string
+          example: USDC
         destination:
           type: string
         autoConvert:
@@ -215,6 +197,7 @@ components:
             - payment.failed
         eventVersion:
           type: string
+          example: "2025-01-01"
         livemode:
           type: boolean
         createdAt:
