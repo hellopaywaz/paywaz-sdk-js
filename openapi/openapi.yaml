@@ -1,0 +1,210 @@
+openapi: 3.1.0
+
+info:
+  title: Paywaz Public API
+  description: |
+    Paywaz Public API — the developer gateway into zero-fee, crypto-native payments.
+    Supports stablecoins, Solana-native settlement, and enterprise-grade webhooks.
+  version: 0.1.0
+
+servers:
+  - url: https://api.paywaz.com
+    description: Production
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /payments:
+    post:
+      operationId: createPayment
+      summary: Create a payment
+      description: Initiates a zero-fee crypto or stablecoin payment
+      tags: [Payments]
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+      responses:
+        "201":
+          description: Payment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+
+  /payments/{paymentId}:
+    get:
+      operationId: getPayment
+      summary: Retrieve a payment
+      tags: [Payments]
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "404":
+          description: Payment not found
+
+  /webhooks/payments:
+    post:
+      operationId: receivePaymentWebhook
+      summary: Receive payment webhook events
+      description: |
+        Receives asynchronous payment lifecycle events from Paywaz.
+
+        ### Webhook Signature Verification
+        Paywaz signs webhook events using HMAC-SHA256.
+
+        **Signature format**
+        ```
+        Paywaz-Signature: v1=<hex_signature>
+        ```
+
+        **Signing algorithm**
+        ```
+        signature = HMAC_SHA256(
+          secret = webhook_secret,
+          message = `${timestamp}.${raw_body}`
+        )
+        ```
+
+        **Replay protection**
+        - Reject events where |now − timestamp| > 300 seconds
+
+      tags: [Webhooks]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/PaywazSignature"
+        - $ref: "#/components/parameters/PaywazTimestamp"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookEvent"
+      responses:
+        "200":
+          description: Webhook processed successfully
+        "400":
+          description: Invalid payload or signature
+        "401":
+          description: Signature verification failed
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+
+    PaywazWebhookSignature:
+      type: apiKey
+      in: header
+      name: Paywaz-Signature
+      description: |
+        HMAC-SHA256 webhook signature.
+        Format: `v1=<hex_digest>`
+
+  parameters:
+    PaywazSignature:
+      name: Paywaz-Signature
+      in: header
+      required: true
+      schema:
+        type: string
+
+    PaywazTimestamp:
+      name: Paywaz-Timestamp
+      in: header
+      required: true
+      schema:
+        type: string
+        description: Unix timestamp (seconds)
+
+  schemas:
+    CreatePaymentRequest:
+      type: object
+      required: [amount, currency, destination]
+      properties:
+        amount:
+          type: string
+        currency:
+          type: string
+        destination:
+          type: string
+        autoConvert:
+          type: boolean
+          default: false
+        metadata:
+          type: object
+          additionalProperties: true
+
+    Payment:
+      type: object
+      required: [id, status, amount, currency, createdAt]
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [pending, confirmed, settled, failed]
+        amount:
+          type: string
+        currency:
+          type: string
+        destination:
+          type: string
+        transactionHash:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
+
+    WebhookEvent:
+      type: object
+      required:
+        [id, type, eventVersion, livemode, createdAt, data]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum:
+            - payment.pending
+            - payment.confirmed
+            - payment.settled
+            - payment.failed
+        eventVersion:
+          type: string
+        livemode:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        data:
+          type: object
+          required: [payment]
+          properties:
+            payment:
+              $ref: "#/components/schemas/Payment"
