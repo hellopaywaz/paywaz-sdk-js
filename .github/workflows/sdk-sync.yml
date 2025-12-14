@@ -1,6 +1,7 @@
 name: OpenAPI → SDK Sync Check
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -10,13 +11,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - run: npm ci
+      - name: Install
+        run: npm ci
 
       - name: Generate SDK
         run: npm run generate:sdk
@@ -24,7 +28,13 @@ jobs:
       - name: Ensure SDK is committed
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
-            echo "SDK is out of sync with OpenAPI spec"
+            echo "❌ SDK is out of sync with OpenAPI spec"
+            echo "Fix locally:"
+            echo "  npm ci"
+            echo "  npm run generate:sdk"
+            echo "  git add -A && git commit -m \"Regenerate SDK\""
             git status
             exit 1
+          else
+            echo "✅ SDK is in sync with OpenAPI"
           fi
