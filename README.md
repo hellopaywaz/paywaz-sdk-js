@@ -6,6 +6,13 @@
   </a>
 </p>
 
+## Links
+
+- **SDK Docs (GitHub Pages):** https://hellopaywaz.github.io/paywaz-sdk-js/
+- **Runnable Samples:** https://github.com/hellopaywaz/paywaz-samples
+- **API Versioning Contract:** https://github.com/hellopaywaz/paywaz-public-api/blob/main/docs/versioning.md
+- **Webhook Best Practices:** https://github.com/hellopaywaz/paywaz-public-api/blob/main/docs/webhooks-best-practices.md
+
 # Paywaz JavaScript SDK (Preview)
 
 The **Paywaz JavaScript SDK** provides an easy way to integrate zero-fee, crypto-native payment processing into your website, ecommerce platform, POS, or enterprise application.
