@@ -26,11 +26,11 @@ The **Paywaz JavaScript SDK** provides an easy way to integrate zero-fee, crypto
 
 ## Features (Preview)
 
-- Initialize payments with one function  
-- Non-custodial wallet support  
-- Auto-convert tokens to hedged stablecoins  
-- Built-in signature validation  
-- Lightweight client-side & server-side compatibility  
+- Initialize payments with one function
+- Non-custodial wallet support
+- Auto-convert tokens to hedged stablecoins
+- Built-in signature validation
+- Lightweight client-side & server-side compatibility
 - Designed for high-scale environments (Solana Mainnet)
 
 ---
@@ -53,8 +53,10 @@ The **Paywaz JavaScript SDK** provides an easy way to integrate zero-fee, crypto
 
 ## Quick Start
 
+> Note: This example uses top-level `await` (Node 18+/20+ with ESM). If you’re using CommonJS, wrap it in an async function.
+
 ```js
-import { PaywazClient } from "paywaz-sdk-js";
+import { PaywazClient } from "@paywaz/sdk";
 
 const client = new PaywazClient({ apiKey: "YOUR_API_KEY" });
 
@@ -62,8 +64,7 @@ const session = await client.createPayment({
   amount: "49.99",
   currency: "PZUSD",
   destination: "merchant_wallet_or_destination_id",
-  metadata: { orderId: "12345" }
+  metadata: { orderId: "12345" },
 });
 
 console.log(session);
-
