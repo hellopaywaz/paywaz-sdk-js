@@ -1,3 +1,5 @@
+# Paywaz JavaScript SDK (Preview)
+
 <p align="center">
   <img src="https://img.shields.io/badge/npm-pre--release-blue" alt="npm version" />
   <img src="https://img.shields.io/badge/build-pending-lightgrey" alt="build status" />
@@ -13,8 +15,6 @@
 - **API Versioning Contract:** https://github.com/hellopaywaz/paywaz-public-api/blob/main/docs/versioning.md
 - **Webhook Best Practices:** https://github.com/hellopaywaz/paywaz-public-api/blob/main/docs/webhooks-best-practices.md
 
-# Paywaz JavaScript SDK (Preview)
-
 The **Paywaz JavaScript SDK** provides an easy way to integrate zero-fee, crypto-native payment processing into your website, ecommerce platform, POS, or enterprise application.
 
 > SDK is in pre-release mode.  
@@ -25,6 +25,7 @@ The **Paywaz JavaScript SDK** provides an easy way to integrate zero-fee, crypto
 ---
 
 ## Features (Preview)
+
 - Initialize payments with one function  
 - Non-custodial wallet support  
 - Auto-convert tokens to hedged stablecoins  
@@ -51,6 +52,7 @@ The **Paywaz JavaScript SDK** provides an easy way to integrate zero-fee, crypto
 ---
 
 ## Quick Start
+
 ```js
 import { PaywazClient } from "paywaz-sdk-js";
 
@@ -59,10 +61,9 @@ const client = new PaywazClient({ apiKey: "YOUR_API_KEY" });
 const session = await client.createPayment({
   amount: "49.99",
   currency: "PZUSD",
+  destination: "merchant_wallet_or_destination_id",
   metadata: { orderId: "12345" }
 });
 
 console.log(session);
-
-
 
