@@ -52,7 +52,7 @@
     "test": "node -e \"console.log('ok')\"",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "changeset publish",
+    "release": "changeset publish --provenance",
     "prepublishOnly": "npm run build"
   }
 }
