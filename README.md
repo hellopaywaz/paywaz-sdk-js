@@ -34,6 +34,22 @@ The **Paywaz JavaScript SDK** provides an easy way to integrate zero-fee, crypto
 
 ---
 
+## Examples
+
+### Payments (Runnable)
+- Create a payment (Node):  
+  https://github.com/hellopaywaz/paywaz-samples/tree/main/javascript/payments#create-a-payment
+- Retrieve a payment (Node):  
+  https://github.com/hellopaywaz/paywaz-samples/tree/main/javascript/payments#retrieve-a-payment
+
+### Webhooks (Runnable)
+- Webhook receiver + signature verification (Node):  
+  https://github.com/hellopaywaz/paywaz-samples/tree/main/javascript/webhooks-node
+- Local signed webhook test (no Paywaz needed):  
+  https://github.com/hellopaywaz/paywaz-samples/tree/main/javascript/webhooks-node#local-test-no-paywaz-needed
+
+---
+
 ## Quick Start
 ```js
 import { PaywazClient } from "paywaz-sdk-js";
