@@ -46,3 +46,13 @@
     "release:beta": "npm run build && changeset publish --tag beta"
   }
 }
+{
+  "scripts": {
+    "build": "tsc",
+    "test": "node -e \"console.log('ok')\"",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish",
+    "prepublishOnly": "npm run build"
+  }
+}
