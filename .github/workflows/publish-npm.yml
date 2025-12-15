@@ -1,0 +1,33 @@
+name: Publish SDK to npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "npm dist-tag (e.g. next, latest)"
+        required: true
+        default: "next"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --provenance --tag ${{ inputs.tag }}
