@@ -2,24 +2,17 @@ name: Security Audit (npm audit)
 
 on:
   schedule:
-    - cron: "0 3 * * *"  # Every day at 3 AM UTC
+    - cron: "0 7 * * 1"
   workflow_dispatch:
 
 jobs:
   audit:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run npm audit
-        run: npm audit --audit-level=high
+          cache: npm
+      - run: npm ci
+      - run: npm audit --audit-level=high
