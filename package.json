@@ -43,5 +43,6 @@
     "tsup": "^8.2.4",
     "typescript": "^5.6.3",
     "vitest": "^2.1.2"
+  },
+  "smoke": "node ./scripts/smoke.mjs"
   }
-}
