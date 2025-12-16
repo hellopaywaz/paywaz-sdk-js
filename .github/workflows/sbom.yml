@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Generate SBOM (CycloneDX)
         run: npx -y @cyclonedx/cyclonedx-npm@latest --output-file sbom.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: sbom
           path: sbom.json
