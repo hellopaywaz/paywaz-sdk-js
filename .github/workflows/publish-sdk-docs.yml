@@ -35,7 +35,7 @@ jobs:
           mkdir -p docs
           echo "<html><body><h1>@paywaz/sdk</h1><p>Docs pipeline wired.</p></body></html>" > docs/index.html
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: docs
 
