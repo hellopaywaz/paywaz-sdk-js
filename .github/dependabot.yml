@@ -4,7 +4,6 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    # Prevent major bumps that break workflows
     ignore:
       - dependency-name: "actions/checkout"
         update-types: ["version-update:semver-major"]
