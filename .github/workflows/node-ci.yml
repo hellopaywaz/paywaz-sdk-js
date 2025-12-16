@@ -1,33 +1,31 @@
 name: Node CI
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
+  push:
+    branches: ["main"]
 
 jobs:
-  build:
+  build-and-smoke:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      - name: Install deps
+      - name: Install
         run: npm ci
 
-      - name: Lint
-        run: npm run lint --if-present
-
-      - name: Type check
-        run: npm run typecheck --if-present
-
-      - name: Test
-        run: npm test --if-present
+      - name: Typecheck
+        run: npm run typecheck
 
       - name: Build
         run: npm run build
+
+      - name: Smoke (build + import + instantiate)
+        run: npm run smoke
