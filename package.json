@@ -62,3 +62,4 @@
   }
 }
 "publishConfig": { "access": "public" }
+"test": "node -e \"console.log('ok')\""
