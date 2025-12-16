@@ -58,13 +58,10 @@ The **Paywaz JavaScript SDK** provides an easy way to integrate zero-fee, crypto
 ```js
 import { PaywazClient, webhooks } from "@paywaz/sdk";
 
-const client = new PaywazClient({ apiKey: "YOUR_API_KEY" });
+const client = new PaywazClient("YOUR_API_KEY", "2025-01-01"); // apiVersion optional
 
-const session = await client.createPayment({
-  amount: "49.99",
-  currency: "PZUSD",
-  destination: "merchant_wallet_or_destination_id",
-  metadata: { orderId: "12345" },
+const payment = await client.payments.createPayment({
+  amount: { currency: "USD", value: "49.99" },
 });
 
-console.log(session);
+console.log(payment);
