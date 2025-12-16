@@ -6,4 +6,5 @@ const client = new PaywazClient({
 });
 
 if (!client) throw new Error("Failed to instantiate PaywazClient");
+
 console.log("Smoke OK");
