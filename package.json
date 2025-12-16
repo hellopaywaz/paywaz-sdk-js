@@ -62,3 +62,11 @@
   }
 }
 "publishConfig": { "access": "public" }
+"scripts": {
+  "build": "tsc -p tsconfig.json",
+  "lint": "eslint \"src/**/*.ts\" --max-warnings=0",
+  "test": "node -e \"console.log('ok')\"",
+  "release": "changeset publish --provenance",
+  "release:beta": "npm run build && changeset publish --tag beta",
+  "prepublishOnly": "npm run build"
+}
