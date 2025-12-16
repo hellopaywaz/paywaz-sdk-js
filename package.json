@@ -1,64 +1,26 @@
 {
-  "name": "@paywaz/sdk",
-  "version": "0.1.0",
-  "description": "Paywaz JavaScript SDK",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "tsc",
-    "generate:sdk": "ts-node scripts/generate-sdk.ts",
-    "docs": "typedoc",
-    "prepublishOnly": "npm run build"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "typescript": "^5.0.0",
-    "ts-node": "^10.9.0",
-    "typedoc": "^0.25.0",
-    "@openapitools/openapi-generator-cli": "^2.7.0"
-  }
-}
-{
-  "devDependencies": {
-    "@changesets/cli": "^2.27.0",
-    "typescript": "^5.0.0",
-    "ts-node": "^10.9.0",
-    "typedoc": "^0.25.0",
-    "@openapitools/openapi-generator-cli": "^2.7.0"
-  },
-  "scripts": {
-    "build": "tsc",
-    "generate:sdk": "ts-node scripts/generate-sdk.ts",
-    "docs": "typedoc",
-    "prepublishOnly": "npm run build",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
 
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release:beta": "npm run build && changeset publish --tag beta"
-  }
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "Node",
+
+    "lib": ["ES2022", "DOM"],
+
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+
+    "strict": true,
+    "noImplicitAny": true,
+
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "openapi", "examples"]
 }
-{
-  "scripts": {
-    "build": "tsc",
-    "test": "node -e \"console.log('ok')\"",
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "changeset publish --provenance",
-    "prepublishOnly": "npm run build"
-  }
-}
-{
-  "publishConfig": {
-    "access": "public"
-  }
-}
-"publishConfig": { "access": "public" }
