@@ -56,7 +56,7 @@ The **Paywaz JavaScript SDK** provides an easy way to integrate zero-fee, crypto
 > Note: This example uses top-level `await` (Node 18+/20+ with ESM). If you’re using CommonJS, wrap it in an async function.
 
 ```js
-import { PaywazClient } from "@paywaz/sdk";
+import { PaywazClient, webhooks } from "@paywaz/sdk";
 
 const client = new PaywazClient({ apiKey: "YOUR_API_KEY" });
 
