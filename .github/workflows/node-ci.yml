@@ -28,6 +28,12 @@ jobs:
       - name: Build
         run: npm run build
 
-      # optional if you added scripts/smoke.mjs + npm run smoke
+      # Only run smoke if a "smoke" script exists in package.json
       - name: Smoke (import + instantiate)
-        run: npm run smoke
+        shell: bash
+        run: |
+          if node -e "const p=require('./package.json'); process.exit(p.scripts && p.scripts.smoke ? 0 : 1)"; then
+            npm run smoke
+          else
+            echo "No smoke script found; skipping."
+          fi
