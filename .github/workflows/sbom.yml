@@ -1,16 +1,21 @@
 name: SBOM
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * 1" # Mondays 09:00 UTC
+
+permissions:
+  contents: read
 
 jobs:
   sbom:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Generate SBOM
-        uses: anchore/syft-action@v0.17.0
+      - name: Generate SBOM (CycloneDX)
+        run: npx -y @cyclonedx/cyclonedx-npm@latest --output-file sbom.json
+      - uses: actions/upload-artifact@v4
         with:
-          output: sbom.json
+          name: sbom
+          path: sbom.json
