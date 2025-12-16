@@ -1,43 +1,58 @@
-import { PaymentsApi } from "../generated/api";
-import type {
-  CreatePaymentRequest,
-  Payment,
-} from "../generated/models";
+export type CreatePaymentRequest = Record<string, unknown>;
+export type CreatePaymentResponse = Record<string, unknown>;
 
-export class PaymentsClient {
-  private api: PaymentsApi;
+export type PaymentsCreateOptions = {
+  idempotencyKey?: string;
+};
 
-  constructor(apiKey: string, baseUrl = "https://api.paywaz.com") {
-    this.api = new PaymentsApi({
-      basePath: baseUrl,
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
-    });
-  }
+export interface PaymentsClient {
+  create(
+    payload: CreatePaymentRequest,
+    opts?: PaymentsCreateOptions
+  ): Promise<CreatePaymentResponse>;
+}
+
+export class PaymentsClientImpl implements PaymentsClient {
+  constructor(
+    private readonly baseUrl: string,
+    private readonly apiKey: string,
+    private readonly fetchImpl: typeof fetch = fetch
+  ) {}
 
   async create(
     payload: CreatePaymentRequest,
-    idempotencyKey: string
-  ): Promise<Payment> {
-    const res = await this.api.createPayment(
-      payload,
-      { "Idempotency-Key": idempotencyKey }
-    );
-    return res;
-  }
-  async create(payload, idempotencyKey) {
-  return this.api.createPayment(
-    payload,
-    {
-      "Idempotency-Key": idempotencyKey,
-      ...this.client.headers,
+    opts: PaymentsCreateOptions = {}
+  ): Promise<CreatePaymentResponse> {
+    const headers: Record<string, string> = {
+      "content-type": "application/json",
+      authorization: `Bearer ${this.apiKey}`
+    };
+
+    if (opts.idempotencyKey) {
+      headers["idempotency-key"] = opts.idempotencyKey;
     }
-  );
-}
 
+    const res = await this.fetchImpl(`${this.baseUrl}/payments`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload)
+    });
 
-  async retrieve(paymentId: string): Promise<Payment> {
-    return this.api.getPayment(paymentId);
+    const text = await res.text();
+    let data: unknown = {};
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      data = { raw: text };
+    }
+
+    if (!res.ok) {
+      const err = new Error(`Paywaz API error ${res.status}`);
+      (err as any).status = res.status;
+      (err as any).data = data;
+      throw err;
+    }
+
+    return data as CreatePaymentResponse;
   }
 }
