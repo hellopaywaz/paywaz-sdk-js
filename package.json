@@ -2,63 +2,45 @@
   "name": "@paywaz/sdk",
   "version": "0.1.0",
   "description": "Paywaz JavaScript SDK",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "keywords": ["paywaz", "payments", "sdk", "api", "webhooks"],
+  "license": "MIT",
+  "author": "Paywaz",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hellopaywaz/paywaz-sdk-js.git"
+  },
+  "homepage": "https://github.com/hellopaywaz/paywaz-sdk-js#readme",
+  "bugs": {
+    "url": "https://github.com/hellopaywaz/paywaz-sdk-js/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "tsc",
-    "generate:sdk": "ts-node scripts/generate-sdk.ts",
-    "docs": "typedoc",
-    "prepublishOnly": "npm run build"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "typescript": "^5.0.0",
-    "ts-node": "^10.9.0",
-    "typedoc": "^0.25.0",
-    "@openapitools/openapi-generator-cli": "^2.7.0"
-  }
-}
-{
-  "devDependencies": {
-    "@changesets/cli": "^2.27.0",
-    "typescript": "^5.0.0",
-    "ts-node": "^10.9.0",
-    "typedoc": "^0.25.0",
-    "@openapitools/openapi-generator-cli": "^2.7.0"
-  },
-  "scripts": {
-    "build": "tsc",
-    "generate:sdk": "ts-node scripts/generate-sdk.ts",
-    "docs": "typedoc",
-    "prepublishOnly": "npm run build",
-
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release:beta": "npm run build && changeset publish --tag beta"
-  }
-}
-{
-  "scripts": {
-    "build": "tsc",
-    "test": "node -e \"console.log('ok')\"",
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "changeset publish --provenance",
-    "prepublishOnly": "npm run build"
-  }
-}
-{
+  "files": ["dist", "README.md", "LICENSE"],
   "publishConfig": {
     "access": "public"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsup src/index.ts --format esm,cjs --dts --sourcemap --clean",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "eslint": "^9.10.0",
+    "rimraf": "^6.0.1",
+    "tsup": "^8.2.4",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.2"
   }
 }
-"publishConfig": { "access": "public" }
