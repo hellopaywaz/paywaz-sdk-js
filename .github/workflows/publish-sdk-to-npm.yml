@@ -11,7 +11,8 @@ permissions:
 
 jobs:
   publish:
-    if: ${{ secrets.NPM_TOKEN != '' }}
+    # Dependabot never has secrets; also skip if token not configured
+    if: ${{ github.actor != 'dependabot[bot]' && secrets.NPM_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
