@@ -1,21 +1,83 @@
-import { PaymentsClient } from "./payments";
-import * as webhooks from "./webhooks";
-
-export type PaywazClientOptions = {
-  apiKey: string;
-  baseUrl?: string;
-  paywazVersion?: string;
+export type CreatePaymentRequest = {
+  amount: string | number;
+  currency: string;
+  destination: string;
+  metadata?: Record<string, unknown>;
 };
 
-export class PaywazClient {
-  payments: PaymentsClient;
+export type PaymentStatus = "created" | "pending" | "succeeded" | "failed" | "canceled";
 
-  constructor(options: PaywazClientOptions) {
-    this.payments = new PaymentsClient(options.apiKey, {
-      baseUrl: options.baseUrl,
-      paywazVersion: options.paywazVersion
-    });
-  }
+export type Payment = {
+  id: string;
+  status: PaymentStatus;
+  amount: string;
+  currency: string;
+  destination: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type ApiErrorBody = {
+  error?: { code?: string; message?: string; details?: unknown };
+};
+
+function toErrorMessage(status: number, body: any) {
+  const msg =
+    body?.error?.message ||
+    body?.message ||
+    (typeof body === "string" ? body : null) ||
+    `Request failed with status ${status}`;
+  return msg;
 }
 
-export { webhooks };
+export class PaymentsClient {
+  private apiKey: string;
+  private baseUrl: string;
+
+  constructor(apiKey: string, baseUrl = "https://api.paywaz.com") {
+    this.apiKey = apiKey;
+    this.baseUrl = baseUrl.replace(/\/+$/, "");
+  }
+
+  async create(payload: CreatePaymentRequest, idempotencyKey: string): Promise<Payment> {
+    if (!idempotencyKey?.trim()) throw new Error("idempotencyKey is required");
+
+    const res = await fetch(`${this.baseUrl}/payments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Key": this.apiKey,
+        "Idempotency-Key": idempotencyKey,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const text = await res.text();
+    const body = text ? JSON.parse(text) : null;
+
+    if (!res.ok) {
+      throw new Error(toErrorMessage(res.status, body as ApiErrorBody));
+    }
+
+    return body?.data ?? body;
+  }
+
+  async retrieve(paymentId: string): Promise<Payment> {
+    const res = await fetch(`${this.baseUrl}/payments/${encodeURIComponent(paymentId)}`, {
+      method: "GET",
+      headers: {
+        "X-API-Key": this.apiKey,
+      },
+    });
+
+    const text = await res.text();
+    const body = text ? JSON.parse(text) : null;
+
+    if (!res.ok) {
+      throw new Error(toErrorMessage(res.status, body as ApiErrorBody));
+    }
+
+    return body?.data ?? body;
+  }
+}
