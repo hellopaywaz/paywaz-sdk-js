@@ -1,39 +1,21 @@
-import { PaymentsApi } from "../generated/api";
-import type { CreatePaymentRequest, Payment } from "../generated/models";
+import { PaymentsClient } from "./payments";
+import * as webhooks from "./webhooks";
 
-export type PaymentsClientOptions = {
+export type PaywazClientOptions = {
+  apiKey: string;
   baseUrl?: string;
   paywazVersion?: string;
 };
 
-export class PaymentsClient {
-  private api: PaymentsApi;
-  private headers: Record<string, string>;
+export class PaywazClient {
+  payments: PaymentsClient;
 
-  constructor(apiKey: string, options: PaymentsClientOptions = {}) {
-    const baseUrl = options.baseUrl ?? "https://api.paywaz.com";
-
-    this.headers = {
-      "X-API-Key": apiKey
-    };
-
-    if (options.paywazVersion) {
-      this.headers["Paywaz-Version"] = options.paywazVersion;
-    }
-
-    this.api = new PaymentsApi({
-      basePath: baseUrl,
-      headers: this.headers
+  constructor(options: PaywazClientOptions) {
+    this.payments = new PaymentsClient(options.apiKey, {
+      baseUrl: options.baseUrl,
+      paywazVersion: options.paywazVersion
     });
-  }
-
-  async create(payload: CreatePaymentRequest, idempotencyKey: string): Promise<Payment> {
-    return this.api.createPayment(payload, {
-      "Idempotency-Key": idempotencyKey
-    });
-  }
-
-  async retrieve(paymentId: string): Promise<Payment> {
-    return this.api.getPayment(paymentId);
   }
 }
+
+export { webhooks };
