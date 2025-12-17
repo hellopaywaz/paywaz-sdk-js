@@ -1,41 +1,37 @@
 import { PaymentsApi } from "../generated/api";
-import type {
-  CreatePaymentRequest,
-  Payment,
-} from "../generated/models";
+import type { CreatePaymentRequest, Payment } from "../generated/models";
+
+export type PaymentsClientOptions = {
+  baseUrl?: string;
+  paywazVersion?: string;
+};
 
 export class PaymentsClient {
   private api: PaymentsApi;
+  private headers: Record<string, string>;
 
-  constructor(apiKey: string, baseUrl = "https://api.paywaz.com") {
+  constructor(apiKey: string, options: PaymentsClientOptions = {}) {
+    const baseUrl = options.baseUrl ?? "https://api.paywaz.com";
+
+    this.headers = {
+      "X-API-Key": apiKey
+    };
+
+    if (options.paywazVersion) {
+      this.headers["Paywaz-Version"] = options.paywazVersion;
+    }
+
     this.api = new PaymentsApi({
       basePath: baseUrl,
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
+      headers: this.headers
     });
   }
 
-  async create(
-    payload: CreatePaymentRequest,
-    idempotencyKey: string
-  ): Promise<Payment> {
-    const res = await this.api.createPayment(
-      payload,
-      { "Idempotency-Key": idempotencyKey }
-    );
-    return res;
+  async create(payload: CreatePaymentRequest, idempotencyKey: string): Promise<Payment> {
+    return this.api.createPayment(payload, {
+      "Idempotency-Key": idempotencyKey
+    });
   }
-  async create(payload, idempotencyKey) {
-  return this.api.createPayment(
-    payload,
-    {
-      "Idempotency-Key": idempotencyKey,
-      ...this.client.headers,
-    }
-  );
-}
-
 
   async retrieve(paymentId: string): Promise<Payment> {
     return this.api.getPayment(paymentId);
