@@ -1,7 +1,10 @@
+import crypto from "crypto";
+
 export type CreatePaymentRequest = {
   amount: string | number;
   currency: string;
   destination: string;
+  autoConvert?: boolean;
   metadata?: Record<string, unknown>;
 };
 
@@ -22,6 +25,35 @@ type ApiErrorBody = {
   error?: { code?: string; message?: string; details?: unknown };
 };
 
+type NormalizedHeaders = Record<string, string>;
+
+function buildHeaders(apiKey: string, apiVersion?: string, idempotencyKey?: string): NormalizedHeaders {
+  const headers: NormalizedHeaders = {
+    "Content-Type": "application/json",
+    "X-API-Key": apiKey,
+  };
+
+  if (apiVersion) {
+    headers["Paywaz-Version"] = apiVersion;
+  }
+
+  if (idempotencyKey) {
+    headers["Idempotency-Key"] = idempotencyKey;
+  }
+
+  return headers;
+}
+
+function parseJson(text: string | null) {
+  if (!text) return null;
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
+}
+
 function toErrorMessage(status: number, body: any) {
   const msg =
     body?.error?.message ||
@@ -31,53 +63,80 @@ function toErrorMessage(status: number, body: any) {
   return msg;
 }
 
+type RandomSource = { getRandomValues(data: Uint8Array): void };
+
+function toHex(bytes: Uint8Array) {
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function generateIdempotencyKey() {
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+
+  if (typeof crypto.randomBytes === "function") {
+    return crypto.randomBytes(16).toString("hex");
+  }
+
+  const webCrypto = (globalThis as typeof globalThis & { crypto?: RandomSource }).crypto;
+  if (webCrypto?.getRandomValues) {
+    const bytes = new Uint8Array(16);
+    webCrypto.getRandomValues(bytes);
+    return toHex(bytes);
+  }
+
+  throw new Error("Unable to generate secure idempotency key");
+}
+
 export class PaymentsClient {
   private apiKey: string;
+  private apiVersion?: string;
   private baseUrl: string;
 
-  constructor(apiKey: string, baseUrl = "https://api.paywaz.com") {
+  constructor(apiKey: string, baseUrl = "https://api.paywaz.com", apiVersion?: string) {
     this.apiKey = apiKey;
+    this.apiVersion = apiVersion;
     this.baseUrl = baseUrl.replace(/\/+$/, "");
   }
 
-  async create(payload: CreatePaymentRequest, idempotencyKey: string): Promise<Payment> {
-    if (!idempotencyKey?.trim()) throw new Error("idempotencyKey is required");
+  async create(payload: CreatePaymentRequest, idempotencyKey?: string): Promise<Payment> {
+    const idemKey = idempotencyKey?.trim() || generateIdempotencyKey();
 
     const res = await fetch(`${this.baseUrl}/payments`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-Key": this.apiKey,
-        "Idempotency-Key": idempotencyKey,
-      },
+      headers: buildHeaders(this.apiKey, this.apiVersion, idemKey),
       body: JSON.stringify(payload),
     });
 
-    const text = await res.text();
-    const body = text ? JSON.parse(text) : null;
+    const body = parseJson(await res.text());
 
     if (!res.ok) {
       throw new Error(toErrorMessage(res.status, body as ApiErrorBody));
     }
 
-    return body?.data ?? body;
+    return (body as any)?.data ?? body;
   }
 
   async retrieve(paymentId: string): Promise<Payment> {
     const res = await fetch(`${this.baseUrl}/payments/${encodeURIComponent(paymentId)}`, {
       method: "GET",
-      headers: {
-        "X-API-Key": this.apiKey,
-      },
+      headers: buildHeaders(this.apiKey, this.apiVersion),
     });
 
-    const text = await res.text();
-    const body = text ? JSON.parse(text) : null;
+    const body = parseJson(await res.text());
 
     if (!res.ok) {
       throw new Error(toErrorMessage(res.status, body as ApiErrorBody));
     }
 
-    return body?.data ?? body;
+    return (body as any)?.data ?? body;
+  }
+
+  async createPayment(payload: CreatePaymentRequest, idempotencyKey?: string): Promise<Payment> {
+    return this.create(payload, idempotencyKey);
+  }
+
+  async retrievePayment(paymentId: string): Promise<Payment> {
+    return this.retrieve(paymentId);
   }
 }
