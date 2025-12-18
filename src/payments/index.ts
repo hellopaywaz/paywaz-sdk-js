@@ -63,9 +63,29 @@ function toErrorMessage(status: number, body: any) {
   return msg;
 }
 
+type RandomSource = { getRandomValues(data: Uint8Array): void };
+
+function toHex(bytes: Uint8Array) {
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 function generateIdempotencyKey() {
   if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
-  return `idem_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+
+  if (typeof crypto.randomBytes === "function") {
+    return crypto.randomBytes(16).toString("hex");
+  }
+
+  const webCrypto = (globalThis as typeof globalThis & { crypto?: RandomSource }).crypto;
+  if (webCrypto?.getRandomValues) {
+    const bytes = new Uint8Array(16);
+    webCrypto.getRandomValues(bytes);
+    return toHex(bytes);
+  }
+
+  throw new Error("Unable to generate secure idempotency key");
 }
 
 export class PaymentsClient {
