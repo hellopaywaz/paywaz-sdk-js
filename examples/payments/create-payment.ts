@@ -1,9 +1,10 @@
+import crypto from "crypto";
 import { PaywazClient } from "@paywaz/sdk";
 
 const client = new PaywazClient(process.env.PAYWAZ_API_KEY!);
 
 export async function createPayment() {
-  return client.payments.create(
+  return client.payments.createPayment(
     {
       amount: "2500",
       currency: "USDC",

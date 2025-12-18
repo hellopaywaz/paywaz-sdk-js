@@ -1,52 +1,17 @@
 # Paywaz JavaScript SDK (Preview)
 
-<p align="center">
-  <img src="https://img.shields.io/badge/npm-pre--release-blue" alt="npm version" />
-  <img src="https://img.shields.io/badge/build-pending-lightgrey" alt="build status" />
-  <a href="https://github.com/hellopaywaz/paywaz-license">
-    <img src="https://img.shields.io/badge/license-Paywaz-0068e8.svg" alt="license" />
-  </a>
-</p>
+> **Preview notice**: This SDK is under active development and its API may change.
 
-## Links
+## Overview
 
-- **SDK Docs (GitHub Pages):** https://hellopaywaz.github.io/paywaz-sdk-js/
-- **Runnable Samples:** https://github.com/hellopaywaz/paywaz-samples
-- **API Versioning Contract:** https://github.com/hellopaywaz/paywaz-public-api/blob/main/docs/versioning.md
-- **Webhook Best Practices:** https://github.com/hellopaywaz/paywaz-public-api/blob/main/docs/webhooks-best-practices.md
+The Paywaz JavaScript SDK is a lightweight client for integrating with the Paywaz Payments API. It provides:
 
-The **Paywaz JavaScript SDK** provides an easy way to integrate zero-fee, crypto-native payment processing into your website, ecommerce platform, POS, or enterprise application.
+- Simple helper functions to create and retrieve payments.
+- Webhook verification utilities for secure event handling.
+- TypeScript support with generated types.
 
-> SDK is in pre-release mode.  
-> Interfaces, request structures, and endpoints are subject to change as Paywaz approaches public launch.
->
-> Paywaz-Version: 2025-01-01
+For sample webhook handlers see:
 
----
-
-## Features (Preview)
-
-- Initialize payments with one function
-- Non-custodial wallet support
-- Auto-convert tokens to hedged stablecoins
-- Built-in signature validation
-- Lightweight client-side & server-side compatibility
-- Designed for high-scale environments (Solana Mainnet)
-
----
-
-## Examples
-
-### Payments (Runnable)
-- Create a payment (Node):  
-  https://github.com/hellopaywaz/paywaz-samples/tree/main/javascript/payments#create-a-payment
-- Retrieve a payment (Node):  
-  https://github.com/hellopaywaz/paywaz-samples/tree/main/javascript/payments#retrieve-a-payment
-
-### Webhooks (Runnable)
-- Webhook receiver + signature verification (Node):  
-  https://github.com/hellopaywaz/paywaz-samples/tree/main/javascript/webhooks-node
-- Local signed webhook test (no Paywaz needed):  
   https://github.com/hellopaywaz/paywaz-samples/tree/main/javascript/webhooks-node#local-test-no-paywaz-needed
 
 ---
@@ -58,10 +23,14 @@ The **Paywaz JavaScript SDK** provides an easy way to integrate zero-fee, crypto
 ```js
 import { PaywazClient, webhooks } from "@paywaz/sdk";
 
-const client = new PaywazClient("YOUR_API_KEY", "2025-01-01"); // apiVersion optional
+// You can pass an apiKey directly or an options object
+const client = new PaywazClient({ apiKey: "YOUR_API_KEY", apiVersion: "2025-01-01" });
 
 const payment = await client.payments.createPayment({
-  amount: { currency: "USD", value: "49.99" },
+  amount: "49.99",
+  currency: "USD",
+  destination: "wallet_123",
 });
 
 console.log(payment);
+```
