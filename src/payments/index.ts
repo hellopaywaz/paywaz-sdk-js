@@ -9,7 +9,12 @@ export type CreatePaymentRequest = {
   metadata?: Record<string, unknown>;
 };
 
-export type PaymentStatus = "pending" | "confirmed" | "settled" | "failed";
+export type PaymentStatus =
+  | "created"
+  | "pending"
+  | "succeeded"
+  | "failed"
+  | "canceled";
 
 export type Payment = {
   id: string;
@@ -27,20 +32,29 @@ type ApiErrorBody = {
   message?: string;
 };
 
-export type PaymentsClientOptions = {
-  apiKey: string;
-  apiVersion?: string;
-  baseUrl?: string;
-  fetchFn?: typeof fetch;
-};
+function stripTrailingSlashes(input: string): string {
+  let s = String(input ?? "").trim();
+  while (s.endsWith("/")) s = s.slice(0, -1);
+  return s;
+}
 
-function toErrorMessage(status: number, body: ApiErrorBody | null) {
+function toErrorMessage(status: number, body: any): string {
   const msg =
     body?.error?.message ||
     body?.message ||
     (typeof body === "string" ? body : null) ||
     `Request failed with status ${status}`;
   return msg;
+}
+
+function safeParseJson(text: string): any {
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    // If the server returns non-JSON (HTML, plain text, etc.), preserve it.
+    return text;
+  }
 }
 
 export class PaymentsClient {
@@ -55,58 +69,55 @@ export class PaymentsClient {
     }
 
     this.apiKey = apiKey;
-    this.apiVersion = apiVersion ?? DEFAULT_API_VERSION;
-    this.baseUrl = (baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, "");
-    this.fetchImpl = fetchFn ?? fetch;
+    this.baseUrl = stripTrailingSlashes(baseUrl);
   }
 
-  private buildHeaders(extra?: HeadersInit): HeadersInit {
-    return {
-      "Content-Type": "application/json",
-      "X-API-Key": this.apiKey,
-      "Paywaz-Version": this.apiVersion,
-      ...(extra ?? {}),
-    };
-  }
+  async create(
+    payload: CreatePaymentRequest,
+    idempotencyKey: string
+  ): Promise<Payment> {
+    if (!idempotencyKey?.trim()) throw new Error("idempotencyKey is required");
+
+    const res = await fetch(`${this.baseUrl}/payments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Key": this.apiKey,
+        "Idempotency-Key": idempotencyKey,
+      },
+      body: JSON.stringify(payload),
+    });
 
   private async parseResponse(res: Response) {
     const text = await res.text();
-    const body = text ? (JSON.parse(text) as Record<string, unknown>) : null;
+    const body = safeParseJson(text);
 
     if (!res.ok) {
       throw new Error(toErrorMessage(res.status, body as ApiErrorBody | null));
     }
 
-    return body;
+    return (body?.data ?? body) as Payment;
   }
 
-  async create(payload: CreatePaymentRequest, idempotencyKey: string): Promise<Payment> {
-    if (!idempotencyKey?.trim()) {
-      throw new Error("idempotencyKey is required");
-    }
+  async retrieve(paymentId: string): Promise<Payment> {
+    const res = await fetch(
+      `${this.baseUrl}/payments/${encodeURIComponent(paymentId)}`,
+      {
+        method: "GET",
+        headers: {
+          "X-API-Key": this.apiKey,
+        },
+      }
+    );
 
-    const res = await this.fetchImpl(`${this.baseUrl}/payments`, {
-      method: "POST",
-      headers: this.buildHeaders({ "Idempotency-Key": idempotencyKey }),
-      body: JSON.stringify({
-        autoConvert: false,
-        ...payload,
-      }),
-    });
-
-    return (await this.parseResponse(res)) as Payment;
-  }
+    const text = await res.text();
+    const body = safeParseJson(text);
 
   async retrieve(paymentId: string): Promise<Payment> {
     if (!paymentId?.trim()) {
       throw new Error("paymentId is required");
     }
 
-    const res = await this.fetchImpl(`${this.baseUrl}/payments/${encodeURIComponent(paymentId)}`, {
-      method: "GET",
-      headers: this.buildHeaders(),
-    });
-
-    return (await this.parseResponse(res)) as Payment;
+    return (body?.data ?? body) as Payment;
   }
 }
