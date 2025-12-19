@@ -1,5 +1,6 @@
 import { PaymentsClient } from "./payments";
 import * as webhooks from "./webhooks";
+export * from "./generated/openapi-metadata";
 
 export type PaywazClientOptions = {
   apiKey: string;
