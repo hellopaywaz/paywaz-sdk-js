@@ -15,12 +15,12 @@
   },
   "type": "module",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/index.esm.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "import": "./dist/index.esm.js",
       "require": "./dist/index.cjs"
     }
   },
@@ -30,7 +30,8 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "tsup src/index.ts --format esm,cjs --dts --sourcemap --clean",
+    "build": "tsup --config tsup.config.mjs",
+    "generate:sdk": "node ./scripts/generate-sdk.mjs",
     "smoke": "node ./scripts/smoke.mjs",
     "prepack": "npm run build",
     "test": "vitest run",
