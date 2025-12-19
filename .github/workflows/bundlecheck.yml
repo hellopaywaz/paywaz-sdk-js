@@ -26,7 +26,7 @@ jobs:
 
       - name: Check bundle size
         run: |
-          SIZE=$(du -k dist/index.esm.js | cut -f1)
+          SIZE=$(du -k dist/index.js | cut -f1)
           echo "Bundle size: $SIZE KB"
           if [ "$SIZE" -gt 250 ]; then
             echo "❌ Bundle too large. Must be < 250 KB"
