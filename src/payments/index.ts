@@ -30,6 +30,10 @@ type ApiErrorBody = {
   message?: string;
 };
 
+type ApiResponse<T> = {
+  data?: T;
+};
+
 function stripTrailingSlashes(input: string): string {
   let s = String(input ?? "").trim();
   while (s.endsWith("/")) s = s.slice(0, -1);
@@ -59,26 +63,42 @@ export class PaymentsClient {
   private baseUrl: string;
 
   constructor(apiKey: string, baseUrl = "https://api.paywaz.com") {
-    this.apiKey = apiKey;
+    if (!apiKey?.trim()) throw new Error("apiKey is required");
+    this.apiKey = apiKey.trim();
     this.baseUrl = stripTrailingSlashes(baseUrl);
   }
 
-  async create(
-    payload: CreatePaymentRequest,
-    idempotencyKey: string
-  ): Promise<Payment> {
-    if (!idempotencyKey?.trim()) throw new Error("idempotencyKey is required");
+  private normalizePayload(payload: CreatePaymentRequest): CreatePaymentRequest {
+    if (!payload || typeof payload !== "object") {
+      throw new Error("payload is required");
+    }
 
-    const res = await fetch(`${this.baseUrl}/payments`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-Key": this.apiKey,
-        "Idempotency-Key": idempotencyKey,
-      },
-      body: JSON.stringify(payload),
-    });
+    const amount =
+      typeof payload.amount === "number"
+        ? payload.amount.toString()
+        : payload.amount?.trim();
+    const currency = payload.currency?.trim();
+    const destination = payload.destination?.trim();
 
+    if (!amount) throw new Error("amount is required");
+    if (!currency) throw new Error("currency is required");
+    if (!destination) throw new Error("destination is required");
+
+    return {
+      ...payload,
+      amount,
+      currency,
+      destination,
+    };
+  }
+
+  private ensureIdempotencyKey(idempotencyKey: string): string {
+    const normalized = idempotencyKey?.trim();
+    if (!normalized) throw new Error("idempotencyKey is required");
+    return normalized;
+  }
+
+  private async parseResponse<T>(res: Response): Promise<T> {
     const text = await res.text();
     const body = safeParseJson(text);
 
@@ -86,12 +106,35 @@ export class PaymentsClient {
       throw new Error(toErrorMessage(res.status, body as ApiErrorBody));
     }
 
-    return (body?.data ?? body) as Payment;
+    return ((body as ApiResponse<T>)?.data ?? body) as T;
+  }
+
+  async create(
+    payload: CreatePaymentRequest,
+    idempotencyKey: string
+  ): Promise<Payment> {
+    const normalizedPayload = this.normalizePayload(payload);
+    const normalizedIdempotencyKey = this.ensureIdempotencyKey(idempotencyKey);
+
+    const res = await fetch(`${this.baseUrl}/payments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Key": this.apiKey,
+        "Idempotency-Key": normalizedIdempotencyKey,
+      },
+      body: JSON.stringify(normalizedPayload),
+    });
+
+    return this.parseResponse<Payment>(res);
   }
 
   async retrieve(paymentId: string): Promise<Payment> {
+    const normalizedPaymentId = paymentId?.trim();
+    if (!normalizedPaymentId) throw new Error("paymentId is required");
+
     const res = await fetch(
-      `${this.baseUrl}/payments/${encodeURIComponent(paymentId)}`,
+      `${this.baseUrl}/payments/${encodeURIComponent(normalizedPaymentId)}`,
       {
         method: "GET",
         headers: {
@@ -100,13 +143,6 @@ export class PaymentsClient {
       }
     );
 
-    const text = await res.text();
-    const body = safeParseJson(text);
-
-    if (!res.ok) {
-      throw new Error(toErrorMessage(res.status, body as ApiErrorBody));
-    }
-
-    return (body?.data ?? body) as Payment;
+    return this.parseResponse<Payment>(res);
   }
 }
