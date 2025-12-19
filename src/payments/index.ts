@@ -1,3 +1,5 @@
+// src/payments/index.ts
+
 export type CreatePaymentRequest = {
   amount: string | number;
   currency: string;
@@ -48,7 +50,6 @@ function safeParseJson(text: string): any {
   try {
     return JSON.parse(text);
   } catch {
-    // If the server returns non-JSON (HTML, plain text, etc.), preserve it.
     return text;
   }
 }
