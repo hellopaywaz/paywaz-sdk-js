@@ -16,12 +16,7 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install deps (ci if lockfile exists)
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+      - name: Install deps
+        run: npm install
 
       - run: npm audit --audit-level=high

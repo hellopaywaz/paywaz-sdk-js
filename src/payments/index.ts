@@ -1,25 +1,13 @@
-export type CreatePaymentRequest = {
-  amount: string | number;
-  currency: string;
-  destination: string;
-  metadata?: Record<string, unknown>;
-};
-
-export type PaymentStatus = "created" | "pending" | "succeeded" | "failed" | "canceled";
-
-export type Payment = {
-  id: string;
-  status: PaymentStatus;
-  amount: string;
-  currency: string;
-  destination: string;
-  metadata?: Record<string, unknown>;
-  createdAt: string;
-  updatedAt: string;
-};
+import { CreatePaymentRequest, OPENAPI_VERSION, Payment, PaymentStatus } from "../generated";
+export type { CreatePaymentRequest, Payment, PaymentStatus } from "../generated";
 
 type ApiErrorBody = {
   error?: { code?: string; message?: string; details?: unknown };
+};
+
+type RequestOptions = {
+  apiVersion?: string;
+  baseUrl?: string;
 };
 
 function toErrorMessage(status: number, body: any) {
@@ -34,22 +22,30 @@ function toErrorMessage(status: number, body: any) {
 export class PaymentsClient {
   private apiKey: string;
   private baseUrl: string;
+  private apiVersion?: string;
 
-  constructor(apiKey: string, baseUrl = "https://api.paywaz.com") {
+  constructor(apiKey: string, options: RequestOptions = {}) {
     this.apiKey = apiKey;
-    this.baseUrl = baseUrl.replace(/\/+$/, "");
+    this.apiVersion = options.apiVersion ?? OPENAPI_VERSION;
+    this.baseUrl = (options.baseUrl ?? "https://api.paywaz.com").replace(/\/+$/, "");
   }
 
   async create(payload: CreatePaymentRequest, idempotencyKey: string): Promise<Payment> {
     if (!idempotencyKey?.trim()) throw new Error("idempotencyKey is required");
 
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "X-API-Key": this.apiKey,
+      "Idempotency-Key": idempotencyKey,
+    };
+
+    if (this.apiVersion) {
+      headers["Paywaz-Version"] = this.apiVersion;
+    }
+
     const res = await fetch(`${this.baseUrl}/payments`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-Key": this.apiKey,
-        "Idempotency-Key": idempotencyKey,
-      },
+      headers,
       body: JSON.stringify(payload),
     });
 
@@ -64,11 +60,17 @@ export class PaymentsClient {
   }
 
   async retrieve(paymentId: string): Promise<Payment> {
+    const headers: Record<string, string> = {
+      "X-API-Key": this.apiKey,
+    };
+
+    if (this.apiVersion) {
+      headers["Paywaz-Version"] = this.apiVersion;
+    }
+
     const res = await fetch(`${this.baseUrl}/payments/${encodeURIComponent(paymentId)}`, {
       method: "GET",
-      headers: {
-        "X-API-Key": this.apiKey,
-      },
+      headers,
     });
 
     const text = await res.text();

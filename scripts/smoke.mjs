@@ -1,5 +1,5 @@
 // scripts/smoke.mjs
-import { PaywazClient } from "../dist/index.js";
+import { PaywazClient } from "../dist/index.esm.js";
 
 const client = new PaywazClient({ apiKey: "smoke_test_key" });
 
