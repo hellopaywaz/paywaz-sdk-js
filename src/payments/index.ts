@@ -1,7 +1,11 @@
+export const DEFAULT_API_VERSION = "2025-01-01";
+export const DEFAULT_BASE_URL = "https://api.paywaz.com";
+
 export type CreatePaymentRequest = {
-  amount: string | number;
+  amount: string;
   currency: string;
   destination: string;
+  autoConvert?: boolean;
   metadata?: Record<string, unknown>;
 };
 
@@ -18,9 +22,9 @@ export type Payment = {
   amount: string;
   currency: string;
   destination: string;
+  transactionHash?: string | null;
   metadata?: Record<string, unknown>;
   createdAt: string;
-  updatedAt: string;
 };
 
 type ApiErrorBody = {
@@ -55,9 +59,15 @@ function safeParseJson(text: string): any {
 
 export class PaymentsClient {
   private apiKey: string;
+  private apiVersion: string;
   private baseUrl: string;
+  private fetchImpl: typeof fetch;
 
-  constructor(apiKey: string, baseUrl = "https://api.paywaz.com") {
+  constructor({ apiKey, apiVersion, baseUrl, fetchFn }: PaymentsClientOptions) {
+    if (!apiKey?.trim()) {
+      throw new Error("apiKey is required");
+    }
+
     this.apiKey = apiKey;
     this.baseUrl = stripTrailingSlashes(baseUrl);
   }
@@ -78,11 +88,12 @@ export class PaymentsClient {
       body: JSON.stringify(payload),
     });
 
+  private async parseResponse(res: Response) {
     const text = await res.text();
     const body = safeParseJson(text);
 
     if (!res.ok) {
-      throw new Error(toErrorMessage(res.status, body as ApiErrorBody));
+      throw new Error(toErrorMessage(res.status, body as ApiErrorBody | null));
     }
 
     return (body?.data ?? body) as Payment;
@@ -102,8 +113,9 @@ export class PaymentsClient {
     const text = await res.text();
     const body = safeParseJson(text);
 
-    if (!res.ok) {
-      throw new Error(toErrorMessage(res.status, body as ApiErrorBody));
+  async retrieve(paymentId: string): Promise<Payment> {
+    if (!paymentId?.trim()) {
+      throw new Error("paymentId is required");
     }
 
     return (body?.data ?? body) as Payment;

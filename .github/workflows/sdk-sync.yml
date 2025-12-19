@@ -20,7 +20,7 @@ jobs:
           node-version: 20
 
       - name: Install
-        run: npm ci
+        run: npm install --no-package-lock
 
       - name: Generate SDK
         run: npm run generate:sdk
@@ -30,7 +30,7 @@ jobs:
           if [[ -n "$(git status --porcelain)" ]]; then
             echo "❌ SDK is out of sync with OpenAPI spec"
             echo "Fix locally:"
-            echo "  npm ci"
+            echo "  npm install --no-package-lock"
             echo "  npm run generate:sdk"
             echo "  git add -A && git commit -m \"Regenerate SDK\""
             git status

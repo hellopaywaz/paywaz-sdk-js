@@ -22,6 +22,7 @@ paths:
       description: Initiates a zero-fee crypto or stablecoin payment
       tags: [Payments]
       parameters:
+        - $ref: "#/components/parameters/PaywazVersion"
         - name: Idempotency-Key
           in: header
           required: true
@@ -47,6 +48,7 @@ paths:
       summary: Retrieve a payment
       tags: [Payments]
       parameters:
+        - $ref: "#/components/parameters/PaywazVersion"
         - name: paymentId
           in: path
           required: true
@@ -108,67 +110,24 @@ paths:
           description: Signature verification failed
 
 components:
-  schemas:
-    WebhookEvent:
-      type: object
-      required:
-        - id
-        - type
-        - eventVersion
-        - livemode
-        - createdAt
-        - data
-      properties:
-        id:
-          type: string
-          example: "evt_01HZXY9M8A3P9"
-
-        type:
-          type: string
-          enum:
-            - payment.pending
-            - payment.confirmed
-            - payment.settled
-            - payment.failed
-
-        eventVersion:
-          type: string
-          description: Version of the webhook payload schema
-          example: "2025-01-01"
-
-        livemode:
-          type: boolean
-
-        createdAt:
-          type: string
-          format: date-time
-
-        data:
-          type: object
-          required: [payment]
-          properties:
-            payment:
-              $ref: "#/components/schemas/Payment"
-
-    PaywazWebhookSignature:
+  securitySchemes:
+    ApiKeyAuth:
       type: apiKey
       in: header
-      name: Paywaz-Signature
-      description: |
-        HMAC-SHA256 webhook signature.
-        Format: `v1=<hex_digest>`
+      name: X-API-Key
+      description: API key used to authenticate requests.
 
   parameters:
-  PaywazVersion:
-    name: Paywaz-Version
-    in: header
-    required: false
-    schema:
-      type: string
-      example: "2025-01-01"
-    description: |
-      API version to use for this request.
-      Defaults to the account's pinned version if omitted.
+    PaywazVersion:
+      name: Paywaz-Version
+      in: header
+      required: false
+      schema:
+        type: string
+        example: "2025-01-01"
+      description: |
+        API version to use for this request.
+        Defaults to the account's pinned version if omitted.
 
     PaywazTimestamp:
       name: Paywaz-Timestamp
@@ -177,6 +136,15 @@ components:
       schema:
         type: string
         description: Unix timestamp (seconds)
+
+    PaywazSignature:
+      name: Paywaz-Signature
+      in: header
+      required: true
+      schema:
+        type: string
+        description: |
+          HMAC-SHA256 webhook signature formatted as `v1=<hex_digest>`
 
   schemas:
     CreatePaymentRequest:
@@ -224,10 +192,17 @@ components:
     WebhookEvent:
       type: object
       required:
-        [id, type, eventVersion, livemode, createdAt, data]
+        - id
+        - type
+        - eventVersion
+        - livemode
+        - createdAt
+        - data
       properties:
         id:
           type: string
+          example: "evt_01HZXY9M8A3P9"
+
         type:
           type: string
           enum:
@@ -235,13 +210,19 @@ components:
             - payment.confirmed
             - payment.settled
             - payment.failed
+
         eventVersion:
           type: string
+          description: Version of the webhook payload schema
+          example: "2025-01-01"
+
         livemode:
           type: boolean
+
         createdAt:
           type: string
           format: date-time
+
         data:
           type: object
           required: [payment]
