@@ -1,13 +1,11 @@
- {
-   "extends": "./tsconfig.base.json",
-   "compilerOptions": {
-     "rootDir": ".",
-     "outDir": "dist",
--    "moduleResolution": "NodeNext"
-+    "moduleResolution": "NodeNext",
-+    "module": "NodeNext"
-   },
--  "include": ["src/**/*.ts", "src/**/*.tsx"],
-+  "include": ["src/**/*.ts", "src/**/*.tsx", "scripts/**/*.mjs"],
-   "exclude": ["dist", "node_modules"]
- }
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext"
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "scripts/**/*.mjs"],
+  "exclude": ["dist", "node_modules"]
+}
