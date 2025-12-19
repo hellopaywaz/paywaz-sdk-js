@@ -18,6 +18,18 @@
   "plugins": [
     "@typescript-eslint"
   ],
+  "overrides": [
+    {
+      "files": ["**/*.test.ts", "**/*.spec.ts"],
+      "env": {
+        "jest": true,
+        "node": true
+      },
+      "globals": {
+        "vi": "readonly"
+      }
+    }
+  ],
   "rules": {
     "no-unused-vars": "warn",
     "no-undef": "error",

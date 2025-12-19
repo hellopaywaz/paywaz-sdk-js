@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Paywaz JavaScript SDK",
   "keywords": ["paywaz", "payments", "sdk", "api", "webhooks"],
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "author": "Paywaz",
   "repository": {
     "type": "git",
@@ -28,6 +28,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "clean": "rimraf dist",
     "build": "tsup src/index.ts --format esm,cjs --dts --sourcemap --clean",
@@ -38,8 +41,13 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.13.0",
+    "@typescript-eslint/parser": "^8.13.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "@types/node": "^20.11.30",
     "eslint": "^9.10.0",
+    "prettier": "^3.3.3",
     "rimraf": "^6.0.1",
     "tsup": "^8.2.4",
     "typescript": "^5.6.3",

@@ -58,10 +58,29 @@ The **Paywaz JavaScript SDK** provides an easy way to integrate zero-fee, crypto
 ```js
 import { PaywazClient, webhooks } from "@paywaz/sdk";
 
-const client = new PaywazClient("YOUR_API_KEY", "2025-01-01"); // apiVersion optional
+const client = new PaywazClient({ apiKey: "YOUR_API_KEY", apiVersion: "2025-01-01" });
 
-const payment = await client.payments.createPayment({
-  amount: { currency: "USD", value: "49.99" },
-});
+const payment = await client.payments.create(
+  {
+    amount: "49.99",
+    currency: "USD",
+    destination: "DESTINATION_ID",
+  },
+  "unique-idempotency-key"
+);
 
 console.log(payment);
+
+// Webhook verification helper
+// const isValid = webhooks.verifySignature({ ... });
+```
+
+## Development
+
+Run these commands from the repository root:
+
+- Lint: `npm run lint`
+- Typecheck: `npm run typecheck`
+- Tests: `npm test`
+- Build: `npm run build`
+- Smoke (after build): `npm run smoke`
