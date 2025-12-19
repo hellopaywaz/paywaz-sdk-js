@@ -14,14 +14,14 @@
     "url": "https://github.com/hellopaywaz/paywaz-sdk-js/issues"
   },
   "type": "module",
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.js"
     }
   },
   "files": ["dist", "README.md", "LICENSE"],
@@ -29,20 +29,15 @@
     "access": "public"
   },
   "scripts": {
-    "clean": "rimraf dist",
-    "build": "tsup src/index.ts --format esm,cjs --dts --sourcemap --clean",
+    "clean": "node ./scripts/clean.mjs",
+    "build": "node ./scripts/build.mjs",
     "smoke": "node ./scripts/smoke.mjs",
     "prepack": "npm run build",
-    "test": "vitest run",
-    "lint": "eslint .",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "test": "node ./scripts/test.mjs",
+    "lint": "node ./scripts/lint.mjs",
+    "typecheck": "node ./scripts/typecheck.mjs"
   },
   "devDependencies": {
-    "@types/node": "^20.11.30",
-    "eslint": "^9.10.0",
-    "rimraf": "^6.0.1",
-    "tsup": "^8.2.4",
-    "typescript": "^5.6.3",
-    "vitest": "^2.1.2"
+    "typescript": "file:./vendor/typescript-5.9.3.tgz"
   }
 }
