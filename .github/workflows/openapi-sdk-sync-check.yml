@@ -22,7 +22,7 @@ jobs:
           cache: npm
 
       - name: Install
-        run: npm ci
+        run: npm install --no-package-lock
 
       # Placeholder for future: compare generated types/client against OpenAPI hash
       - name: Sync check (placeholder)
