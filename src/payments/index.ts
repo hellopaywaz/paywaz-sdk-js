@@ -81,3 +81,11 @@ export class PaymentsClient {
     return body?.data ?? body;
   }
 }
+function stripTrailingSlashes(input: string): string {
+  let s = input.trim();
+  while (s.endsWith("/")) s = s.slice(0, -1);
+  return s;
+}
+
+// ...
+this.baseUrl = stripTrailingSlashes(options.baseUrl ?? "https://api.paywaz.com");
