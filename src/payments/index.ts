@@ -5,7 +5,12 @@ export type CreatePaymentRequest = {
   metadata?: Record<string, unknown>;
 };
 
-export type PaymentStatus = "created" | "pending" | "succeeded" | "failed" | "canceled";
+export type PaymentStatus =
+  | "created"
+  | "pending"
+  | "succeeded"
+  | "failed"
+  | "canceled";
 
 export type Payment = {
   id: string;
@@ -20,9 +25,16 @@ export type Payment = {
 
 type ApiErrorBody = {
   error?: { code?: string; message?: string; details?: unknown };
+  message?: string;
 };
 
-function toErrorMessage(status: number, body: any) {
+function stripTrailingSlashes(input: string): string {
+  let s = String(input ?? "").trim();
+  while (s.endsWith("/")) s = s.slice(0, -1);
+  return s;
+}
+
+function toErrorMessage(status: number, body: any): string {
   const msg =
     body?.error?.message ||
     body?.message ||
@@ -31,16 +43,29 @@ function toErrorMessage(status: number, body: any) {
   return msg;
 }
 
+function safeParseJson(text: string): any {
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    // If the server returns non-JSON (HTML, plain text, etc.), preserve it.
+    return text;
+  }
+}
+
 export class PaymentsClient {
   private apiKey: string;
   private baseUrl: string;
 
   constructor(apiKey: string, baseUrl = "https://api.paywaz.com") {
     this.apiKey = apiKey;
-    this.baseUrl = baseUrl.replace(/\/+$/, "");
+    this.baseUrl = stripTrailingSlashes(baseUrl);
   }
 
-  async create(payload: CreatePaymentRequest, idempotencyKey: string): Promise<Payment> {
+  async create(
+    payload: CreatePaymentRequest,
+    idempotencyKey: string
+  ): Promise<Payment> {
     if (!idempotencyKey?.trim()) throw new Error("idempotencyKey is required");
 
     const res = await fetch(`${this.baseUrl}/payments`, {
@@ -54,38 +79,33 @@ export class PaymentsClient {
     });
 
     const text = await res.text();
-    const body = text ? JSON.parse(text) : null;
+    const body = safeParseJson(text);
 
     if (!res.ok) {
       throw new Error(toErrorMessage(res.status, body as ApiErrorBody));
     }
 
-    return body?.data ?? body;
+    return (body?.data ?? body) as Payment;
   }
 
   async retrieve(paymentId: string): Promise<Payment> {
-    const res = await fetch(`${this.baseUrl}/payments/${encodeURIComponent(paymentId)}`, {
-      method: "GET",
-      headers: {
-        "X-API-Key": this.apiKey,
-      },
-    });
+    const res = await fetch(
+      `${this.baseUrl}/payments/${encodeURIComponent(paymentId)}`,
+      {
+        method: "GET",
+        headers: {
+          "X-API-Key": this.apiKey,
+        },
+      }
+    );
 
     const text = await res.text();
-    const body = text ? JSON.parse(text) : null;
+    const body = safeParseJson(text);
 
     if (!res.ok) {
       throw new Error(toErrorMessage(res.status, body as ApiErrorBody));
     }
 
-    return body?.data ?? body;
+    return (body?.data ?? body) as Payment;
   }
 }
-function stripTrailingSlashes(input: string): string {
-  let s = input.trim();
-  while (s.endsWith("/")) s = s.slice(0, -1);
-  return s;
-}
-
-// ...
-this.baseUrl = stripTrailingSlashes(options.baseUrl ?? "https://api.paywaz.com");
