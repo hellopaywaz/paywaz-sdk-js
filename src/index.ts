@@ -1,5 +1,7 @@
-import { PaymentsClient } from "./payments";
-import * as webhooks from "./webhooks";
+// src/index.ts
+
+import { PaymentsClient } from "./payments/index.js";
+import * as webhooks from "./webhooks/index.js";
 
 export type PaywazClientOptions = {
   apiKey: string;
