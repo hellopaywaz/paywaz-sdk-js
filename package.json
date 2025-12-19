@@ -38,6 +38,6 @@
     "typecheck": "node ./scripts/typecheck.mjs"
   },
   "devDependencies": {
-    "typescript": "file:./vendor/typescript-5.9.3.tgz"
+  "typescript": "5.9.3"
   }
 }
