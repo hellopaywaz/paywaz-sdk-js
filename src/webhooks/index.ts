@@ -1,1 +1,1 @@
-export { verifyPaywazWebhook } from "./verify";
+export { verifyPaywazWebhook } from "./verify.js";
