@@ -57,8 +57,9 @@ export class PaymentsClient {
   private baseUrl: string;
 
   constructor(apiKey: string, baseUrl = "https://api.paywaz.com") {
-    this.apiKey = apiKey;
-    this.baseUrl = stripTrailingSlashes(baseUrl);
+  this.apiKey = apiKey;
+  this.baseUrl = stripTrailingSlashes(baseUrl);
+}
   }
 
   async create(
