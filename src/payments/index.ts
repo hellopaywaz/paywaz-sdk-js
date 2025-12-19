@@ -1,5 +1,3 @@
-// src/payments/index.ts
-
 export type CreatePaymentRequest = {
   amount: string | number;
   currency: string;
