@@ -1,9 +1,6 @@
 {
   "entryPoints": ["src/index.ts"],
   "out": "docs",
-  "readme": "README.md",
-  "name": "Paywaz JavaScript SDK",
-  "excludePrivate": true,
-  "excludeProtected": true,
-  "excludeExternals": true
+  "tsconfig": "tsconfig.json",
+  "githubPages": true
 }
