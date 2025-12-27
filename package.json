@@ -32,12 +32,16 @@
     "clean": "node ./scripts/clean.mjs",
     "build": "node ./scripts/build.mjs",
     "smoke": "node ./scripts/smoke.mjs",
+    "docs": "typedoc --options typedoc.json",
     "prepack": "npm run build",
     "test": "node ./scripts/test.mjs",
     "lint": "node ./scripts/lint.mjs",
-    "typecheck": "node ./scripts/typecheck.mjs"
+    "typecheck": "node ./scripts/typecheck.mjs",
+    "generate:sdk": "node ./scripts/generate-sdk.mjs"
   },
   "devDependencies": {
-  "typescript": "5.9.3"
+    "@openapitools/openapi-generator-cli": "^7.11.0",
+    "typedoc": "^0.27.6",
+    "typescript": "5.9.3"
   }
 }
