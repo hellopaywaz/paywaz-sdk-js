@@ -35,8 +35,10 @@
     "clean": "node ./scripts/clean.mjs",
     "build": "node ./scripts/build.mjs",
     "smoke": "node ./scripts/smoke.mjs",
+
     "docs": "node ./scripts/docs.mjs",
     "generate:sdk": "node ./scripts/generate-sdk.mjs",
+
     "prepack": "npm run build",
     "test": "node ./scripts/test.mjs",
     "lint": "node ./scripts/lint.mjs",
