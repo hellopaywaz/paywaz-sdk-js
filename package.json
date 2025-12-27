@@ -41,3 +41,5 @@
   "typescript": "5.9.3"
   }
 }
+npm pkg set scripts.docs="typedoc --options typedoc.json"
+npm pkg set "scripts.generate:sdk"="node scripts/generate-sdk.mjs"
