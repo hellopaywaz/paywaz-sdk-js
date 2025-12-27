@@ -34,7 +34,7 @@
   "scripts": {
     "clean": "node ./scripts/clean.mjs",
     "build": "node ./scripts/build.mjs",
-    "smoke": "node ./scripts/smoke.mjs",
+    "smoke": "npm run build && node ./scripts/smoke.mjs",
     "docs": "typedoc --options typedoc.json",
     "generate:sdk": "tsx ./scripts/generate-sdk.ts",
     "prepack": "npm run build",
