@@ -27,14 +27,12 @@ jobs:
 
       - name: Ensure SDK is committed
         run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            echo "❌ SDK is out of sync with OpenAPI spec"
-            echo "Fix locally:"
-            echo "  npm ci"
-            echo "  npm run generate:sdk"
-            echo "  git add -A && git commit -m \"Regenerate SDK\""
-            git status
-            exit 1
-          else
-            echo "✅ SDK is in sync with OpenAPI"
-          fi
+          git diff --exit-code || {
+            echo "❌ SDK is out of sync with OpenAPI spec";
+            echo "Fix locally:";
+            echo "  npm ci";
+            echo "  npm run generate:sdk";
+            echo "  git add -A && git commit -m \"Regenerate SDK\"";
+            exit 1;
+          }
+          echo "✅ SDK is in sync with OpenAPI"

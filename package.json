@@ -35,9 +35,13 @@
     "prepack": "npm run build",
     "test": "node ./scripts/test.mjs",
     "lint": "node ./scripts/lint.mjs",
-    "typecheck": "node ./scripts/typecheck.mjs"
+    "typecheck": "node ./scripts/typecheck.mjs",
+    "docs": "typedoc --options typedoc.json",
+    "generate:sdk": "node ./scripts/generate-sdk.mjs"
   },
   "devDependencies": {
-  "typescript": "5.9.3"
+    "@openapitools/openapi-generator-cli": "2.12.1",
+    "typedoc": "0.28.15",
+    "typescript": "5.9.3"
   }
 }
