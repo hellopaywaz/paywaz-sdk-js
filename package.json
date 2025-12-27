@@ -35,9 +35,11 @@
     "prepack": "npm run build",
     "test": "node ./scripts/test.mjs",
     "lint": "node ./scripts/lint.mjs",
-    "typecheck": "node ./scripts/typecheck.mjs"
+    "typecheck": "node ./scripts/typecheck.mjs",
+    "docs": "typedoc"
   },
   "devDependencies": {
-  "typescript": "5.9.3"
+    "typedoc": "file:./tools/typedoc",
+    "typescript": "5.9.3"
   }
 }
