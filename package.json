@@ -21,8 +21,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js"
     }
   },
   "files": ["dist", "README.md", "LICENSE"],
@@ -30,23 +29,23 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
-  "packageManager": "npm@10.9.2",
   "scripts": {
     "clean": "node ./scripts/clean.mjs",
     "build": "node ./scripts/build.mjs",
     "smoke": "node ./scripts/smoke.mjs",
+    "docs": "typedoc --options typedoc.json",
+    "generate:sdk": "tsx ./scripts/generate-sdk.ts",
     "prepack": "npm run build",
     "test": "node ./scripts/test.mjs",
     "lint": "node ./scripts/lint.mjs",
-    "typecheck": "node ./scripts/typecheck.mjs",
-    "docs": "typedoc --options typedoc.json",
-    "generate:sdk": "node ./scripts/generate-sdk.mjs"
+    "typecheck": "node ./scripts/typecheck.mjs"
   },
   "devDependencies": {
-    "typescript": "5.9.3",
-    "typedoc": "^0.27.9"
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typedoc": "0.27.9",
+    "typescript": "5.8.3"
   }
 }
-
