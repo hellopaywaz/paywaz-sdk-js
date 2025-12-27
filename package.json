@@ -35,10 +35,8 @@
     "clean": "node ./scripts/clean.mjs",
     "build": "node ./scripts/build.mjs",
     "smoke": "node ./scripts/smoke.mjs",
-
-    "docs": "node ./scripts/docs.mjs",
-    "generate:sdk": "node ./scripts/generate-sdk.mjs",
-
+    "docs": "typedoc --options typedoc.json",
+    "generate:sdk": "tsx ./scripts/generate-sdk.ts",
     "prepack": "npm run build",
     "test": "node ./scripts/test.mjs",
     "lint": "node ./scripts/lint.mjs",
@@ -48,6 +46,6 @@
     "@types/node": "^22.0.0",
     "tsx": "^4.0.0",
     "typedoc": "0.27.9",
-    "typescript": "5.8.3"
+    "typescript": "5.9.3"
   }
 }
