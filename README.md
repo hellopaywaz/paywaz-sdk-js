@@ -65,3 +65,14 @@ const payment = await client.payments.createPayment({
 });
 
 console.log(payment);
+
+```
+
+## Development / CI parity
+
+Run the same steps locally as CI:
+
+- `npm ci`
+- `npm run typecheck`
+- `npm run build`
+- `npm run docs`
