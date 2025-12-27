@@ -3,10 +3,10 @@ import { resolve } from "node:path";
 import { spawn } from "node:child_process";
 
 const vendorDir = resolve(process.cwd(), "vendor");
-const typescriptTar = resolve(vendorDir, "typescript-5.9.3.tgz");
+const typescriptTar = resolve(vendorDir, "typescript-5.8.3.tgz");
 
 if (!existsSync(typescriptTar)) {
-  console.error("Missing vendored TypeScript tarball. Please add vendor/typescript-5.9.3.tgz");
+  console.error("Missing vendored TypeScript tarball. Please add vendor/typescript-5.8.3.tgz");
   process.exit(1);
 }
 

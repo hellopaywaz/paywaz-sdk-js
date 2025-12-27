@@ -24,8 +24,13 @@ jobs:
       - name: Install
         run: npm ci
 
-      # Placeholder for future: compare generated types/client against OpenAPI hash
-      - name: Sync check (placeholder)
+      - name: Generate SDK snapshot
+        run: npm run generate:sdk
+
+      - name: Ensure generated files are committed
         run: |
-          echo "OpenAPI → SDK sync check is manual/scheduled only for now."
-          echo "TODO: add real sync verification (e.g., openapi hash, generated client diff, etc.)"
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "Generated SDK files are out of sync with the repository." >&2
+            git status --short
+            exit 1
+          fi
