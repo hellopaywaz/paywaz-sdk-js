@@ -13,3 +13,20 @@ change-template: "- $TITLE (#$NUMBER) @$AUTHOR"
 template: |
   ## Changes
   $CHANGES
+
+version-resolver:
+  major:
+    labels:
+      - major
+  minor:
+    labels:
+      - minor
+      - feature
+      - enhancement
+  patch:
+    labels:
+      - patch
+      - bug
+      - fix
+      - chore
+  default: patch
