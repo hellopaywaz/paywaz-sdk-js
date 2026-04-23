@@ -1,5 +1,8 @@
 name: Typedoc Documentation Build
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main ]
