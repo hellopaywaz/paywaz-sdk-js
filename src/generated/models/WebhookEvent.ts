@@ -40,7 +40,7 @@ export interface WebhookEvent {
      */
     type: WebhookEventTypeEnum;
     /**
-     * 
+     * Version of the webhook payload schema
      * @type {string}
      * @memberof WebhookEvent
      */

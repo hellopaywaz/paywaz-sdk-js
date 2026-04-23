@@ -23,9 +23,9 @@ import {
 } from '../models/index';
 
 export interface ReceivePaymentWebhookRequest {
+    paywazSignature: string;
+    paywazTimestamp: string;
     webhookEvent: WebhookEvent;
-    UNKNOWN_PARAMETER_NAME?: ;
-    UNKNOWN_PARAMETER_NAME2?: ;
 }
 
 /**
@@ -37,6 +37,20 @@ export class WebhooksApi extends runtime.BaseAPI {
      * Creates request options for receivePaymentWebhook without sending the request
      */
     async receivePaymentWebhookRequestOpts(requestParameters: ReceivePaymentWebhookRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['paywazSignature'] == null) {
+            throw new runtime.RequiredError(
+                'paywazSignature',
+                'Required parameter "paywazSignature" was null or undefined when calling receivePaymentWebhook().'
+            );
+        }
+
+        if (requestParameters['paywazTimestamp'] == null) {
+            throw new runtime.RequiredError(
+                'paywazTimestamp',
+                'Required parameter "paywazTimestamp" was null or undefined when calling receivePaymentWebhook().'
+            );
+        }
+
         if (requestParameters['webhookEvent'] == null) {
             throw new runtime.RequiredError(
                 'webhookEvent',
@@ -50,8 +64,16 @@ export class WebhooksApi extends runtime.BaseAPI {
 
         headerParameters['Content-Type'] = 'application/json';
 
+        if (requestParameters['paywazSignature'] != null) {
+            headerParameters['Paywaz-Signature'] = String(requestParameters['paywazSignature']);
+        }
 
-        let urlPath = `/webhooks/payments`;
+        if (requestParameters['paywazTimestamp'] != null) {
+            headerParameters['Paywaz-Timestamp'] = String(requestParameters['paywazTimestamp']);
+        }
+
+
+        let urlPath = `/payments/{paymentId}`;
 
         return {
             path: urlPath,
