@@ -20,7 +20,8 @@ paths:
       operationId: createPayment
       summary: Create a payment
       description: Initiates a zero-fee crypto or stablecoin payment
-      tags: [Payments]
+      tags:
+        - Payments
       parameters:
         - name: Idempotency-Key
           in: header
@@ -45,7 +46,8 @@ paths:
     get:
       operationId: getPayment
       summary: Retrieve a payment
-      tags: [Payments]
+      tags:
+        - Payments
       parameters:
         - name: paymentId
           in: path
@@ -87,8 +89,8 @@ paths:
 
         **Replay protection**
         - Reject events where |now − timestamp| > 300 seconds
-
-      tags: [Webhooks]
+      tags:
+        - Webhooks
       security: []
       parameters:
         - $ref: "#/components/parameters/PaywazSignature"
@@ -108,67 +110,33 @@ paths:
           description: Signature verification failed
 
 components:
-  schemas:
-    WebhookEvent:
-      type: object
-      required:
-        - id
-        - type
-        - eventVersion
-        - livemode
-        - createdAt
-        - data
-      properties:
-        id:
-          type: string
-          example: "evt_01HZXY9M8A3P9"
-
-        type:
-          type: string
-          enum:
-            - payment.pending
-            - payment.confirmed
-            - payment.settled
-            - payment.failed
-
-        eventVersion:
-          type: string
-          description: Version of the webhook payload schema
-          example: "2025-01-01"
-
-        livemode:
-          type: boolean
-
-        createdAt:
-          type: string
-          format: date-time
-
-        data:
-          type: object
-          required: [payment]
-          properties:
-            payment:
-              $ref: "#/components/schemas/Payment"
-
-    PaywazWebhookSignature:
+  securitySchemes:
+    ApiKeyAuth:
       type: apiKey
       in: header
+      name: X-Api-Key
+
+  parameters:
+    PaywazVersion:
+      name: Paywaz-Version
+      in: header
+      required: false
+      schema:
+        type: string
+        example: "2025-01-01"
+      description: |
+        API version to use for this request.
+        Defaults to the account's pinned version if omitted.
+
+    PaywazSignature:
       name: Paywaz-Signature
+      in: header
+      required: true
+      schema:
+        type: string
       description: |
         HMAC-SHA256 webhook signature.
         Format: `v1=<hex_digest>`
-
-  parameters:
-  PaywazVersion:
-    name: Paywaz-Version
-    in: header
-    required: false
-    schema:
-      type: string
-      example: "2025-01-01"
-    description: |
-      API version to use for this request.
-      Defaults to the account's pinned version if omitted.
 
     PaywazTimestamp:
       name: Paywaz-Timestamp
@@ -181,7 +149,10 @@ components:
   schemas:
     CreatePaymentRequest:
       type: object
-      required: [amount, currency, destination]
+      required:
+        - amount
+        - currency
+        - destination
       properties:
         amount:
           type: string
@@ -198,13 +169,22 @@ components:
 
     Payment:
       type: object
-      required: [id, status, amount, currency, createdAt]
+      required:
+        - id
+        - status
+        - amount
+        - currency
+        - createdAt
       properties:
         id:
           type: string
         status:
           type: string
-          enum: [pending, confirmed, settled, failed]
+          enum:
+            - pending
+            - confirmed
+            - settled
+            - failed
         amount:
           type: string
         currency:
@@ -224,10 +204,16 @@ components:
     WebhookEvent:
       type: object
       required:
-        [id, type, eventVersion, livemode, createdAt, data]
+        - id
+        - type
+        - eventVersion
+        - livemode
+        - createdAt
+        - data
       properties:
         id:
           type: string
+          example: "evt_01HZXY9M8A3P9"
         type:
           type: string
           enum:
@@ -237,6 +223,8 @@ components:
             - payment.failed
         eventVersion:
           type: string
+          description: Version of the webhook payload schema
+          example: "2025-01-01"
         livemode:
           type: boolean
         createdAt:
@@ -244,7 +232,8 @@ components:
           format: date-time
         data:
           type: object
-          required: [payment]
+          required:
+            - payment
           properties:
             payment:
               $ref: "#/components/schemas/Payment"

@@ -50,12 +50,14 @@
     "prepack": "npm run build",
     "test": "node ./scripts/test.mjs",
     "lint": "node ./scripts/lint.mjs",
-    "typecheck": "node ./scripts/typecheck.mjs"
+    "typecheck": "node ./scripts/typecheck.mjs",
+    "generate:sdk": "tsx ./scripts/generate-sdk.ts",
+    "docs": "typedoc"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "tsx": "^4.0.0",
-    "typedoc": "0.27.9",
-    "typescript": "5.8.3"
+  "@openapitools/openapi-generator-cli": "2.13.4",
+  "typedoc": "file:./tools/typedoc",
+  "tsx": "^4.0.0",
+  "typescript": "5.9.3"
   }
 }
