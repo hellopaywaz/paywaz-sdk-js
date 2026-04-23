@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/PaymentsApi.ts
 apis/WebhooksApi.ts
 apis/index.ts
