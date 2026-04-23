@@ -1,0 +1,17 @@
+.openapi-generator-ignore
+apis/PaymentsApi.ts
+apis/WebhooksApi.ts
+apis/index.ts
+docs/CreatePaymentRequest.md
+docs/Payment.md
+docs/PaymentsApi.md
+docs/WebhookEvent.md
+docs/WebhookEventData.md
+docs/WebhooksApi.md
+index.ts
+models/CreatePaymentRequest.ts
+models/Payment.ts
+models/WebhookEvent.ts
+models/WebhookEventData.ts
+models/index.ts
+runtime.ts

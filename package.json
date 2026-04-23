@@ -51,10 +51,13 @@
     "test": "node ./scripts/test.mjs",
     "lint": "node ./scripts/lint.mjs",
     "typecheck": "node ./scripts/typecheck.mjs",
+    "generate:sdk": "tsx ./scripts/generate-sdk.ts",
     "docs": "typedoc"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.13.4",
     "typedoc": "file:./tools/typedoc",
+    "tsx": "^4.0.0",
     "typescript": "5.9.3"
   }
 }
