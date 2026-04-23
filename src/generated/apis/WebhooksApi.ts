@@ -73,7 +73,7 @@ export class WebhooksApi extends runtime.BaseAPI {
         }
 
 
-        let urlPath = `/payments/{paymentId}`;
+        let urlPath = `/webhooks/payments`;
 
         return {
             path: urlPath,

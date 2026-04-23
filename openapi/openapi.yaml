@@ -20,7 +20,8 @@ paths:
       operationId: createPayment
       summary: Create a payment
       description: Initiates a zero-fee crypto or stablecoin payment
-      tags: [Payments]
+      tags:
+        - Payments
       parameters:
         - name: Idempotency-Key
           in: header
@@ -45,7 +46,8 @@ paths:
     get:
       operationId: getPayment
       summary: Retrieve a payment
-      tags: [Payments]
+      tags:
+        - Payments
       parameters:
         - name: paymentId
           in: path
@@ -62,7 +64,7 @@ paths:
         "404":
           description: Payment not found
 
-    /webhooks/payments:
+  /webhooks/payments:
     post:
       operationId: receivePaymentWebhook
       summary: Receive payment webhook events
@@ -87,8 +89,8 @@ paths:
 
         **Replay protection**
         - Reject events where |now − timestamp| > 300 seconds
-
-      tags: [Webhooks]
+      tags:
+        - Webhooks
       security: []
       parameters:
         - $ref: "#/components/parameters/PaywazSignature"
@@ -235,4 +237,3 @@ components:
           properties:
             payment:
               $ref: "#/components/schemas/Payment"
-              
