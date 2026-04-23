@@ -55,9 +55,9 @@
     "docs": "typedoc"
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.13.4",
-    "typedoc": "file:./tools/typedoc",
-    "tsx": "^4.0.0",
-    "typescript": "5.9.3"
+  "@openapitools/openapi-generator-cli": "2.13.4",
+  "typedoc": "file:./tools/typedoc",
+  "tsx": "^4.0.0",
+  "typescript": "5.9.3"
   }
 }
