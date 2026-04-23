@@ -2,12 +2,6 @@
 apis/PaymentsApi.ts
 apis/WebhooksApi.ts
 apis/index.ts
-docs/CreatePaymentRequest.md
-docs/Payment.md
-docs/PaymentsApi.md
-docs/WebhookEvent.md
-docs/WebhookEventData.md
-docs/WebhooksApi.md
 index.ts
 models/CreatePaymentRequest.ts
 models/Payment.ts
